@@ -27,7 +27,7 @@ namespace JaeminPark.PlatformerKit
         }
     }
 
-    [AddComponentMenu("Platformer Kit")]
+    [AddComponentMenu("Platformer Kit/Platformer Collider")]
     public class PlatformerCollider : MonoBehaviour
     {
         [SerializeField]

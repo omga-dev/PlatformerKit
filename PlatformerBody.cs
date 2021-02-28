@@ -2,7 +2,7 @@
 
 namespace JaeminPark.PlatformerKit
 {
-    [RequireComponent(typeof(PlatformerCollider)), AddComponentMenu("Platformer Kit")]
+    [RequireComponent(typeof(PlatformerCollider)), AddComponentMenu("Platformer Kit/Platformer Body")]
     public class PlatformerBody : MonoBehaviour
     {
         [HideInInspector]
