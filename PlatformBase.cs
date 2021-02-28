@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
 namespace JaeminPark.PlatformerKit
 {
     public abstract class PlatformBase : MonoBehaviour
