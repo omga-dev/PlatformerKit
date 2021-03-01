@@ -1,6 +1,6 @@
 {
 	"name": "com.jaeminpark.platformerkit",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"displayName": "Platformer Kit",
 	"description": "The Platformer Kit is a set of unity components implementing a simple platformer physics with a wide range of extendability using various interfaces.",
 	"unity": "2019.4",
