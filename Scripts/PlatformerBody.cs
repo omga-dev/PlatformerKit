@@ -7,7 +7,7 @@ namespace JaeminPark.PlatformerKit
     {
         [HideInInspector]
         public Vector2 velocity;
-        public Vector2 gravity;
+        public Vector2 gravity = new Vector2(0, -0.02f);
         public LayerMask solidLayer;
         public LayerMask platformLayer;
 

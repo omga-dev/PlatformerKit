@@ -10,13 +10,7 @@ namespace JaeminPark.PlatformerKit
         public float distance;
         public Vector2 normal;
         public GameObject gameObject;
-
-        public static PlatformerHit NoHit
-        {
-            get {
-                return new PlatformerHit(false, Mathf.Infinity, Vector2.zero, null);
-            }
-        }
+        public readonly static PlatformerHit NoHit = new PlatformerHit(false, Mathf.Infinity, Vector2.zero, null);
 
         public PlatformerHit(bool hit, float distance, Vector2 normal, GameObject gameObject)
         {
@@ -49,6 +43,10 @@ namespace JaeminPark.PlatformerKit
         private void Awake()
         {
             tf = transform;
+        }
+
+        private void Start()
+        {
             UpdateHBPosition();
             UpdateVBPosition();
             UpdatePBPosition();
@@ -140,6 +138,9 @@ namespace JaeminPark.PlatformerKit
 
         public PlatformerHit Raycast(Vector2 from, Vector2 to, float skin, Vector2 dir, LayerMask layer, bool ignoreZeroDistance = true)
         {
+            if (!enabled)
+                return PlatformerHit.NoHit;
+
             int count = Mathf.CeilToInt((from - to).magnitude / PlatformerBody.raycastUnit);
 
             PlatformerHit min = PlatformerHit.NoHit;
@@ -169,7 +170,8 @@ namespace JaeminPark.PlatformerKit
             else
                 return PlatformerHit.NoHit;
         }
-        
+
+#if UNITY_EDITOR
         private void OnDrawGizmosSelected()
         {
             Vector2 position = transform.position;
@@ -181,5 +183,6 @@ namespace JaeminPark.PlatformerKit
 
             Debug.DrawLine(position + _verticalHitbox * box[0] - Vector2.down * _platformCheckOffset, position + _verticalHitbox * box[1] - Vector2.down * _platformCheckOffset, new Color(0.694f, 0.992f, 0.349f));
         }
+#endif
     }
 }
