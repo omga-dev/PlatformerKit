@@ -112,7 +112,7 @@ namespace JaeminPark.PlatformerKit
                 transform.position += new Vector3(
                         Mathf.Cos(angle * Mathf.Deg2Rad) * ySpeed * Mathf.Sign(hbUp.normal.x),
                         Mathf.Sin(angle * Mathf.Deg2Rad) * ySpeed * ySign
-                    );
+                    ) * Time.timeScale;
             }
             else if (downSlopeCheck && !downCheck)
             {
@@ -124,7 +124,7 @@ namespace JaeminPark.PlatformerKit
                 transform.position += new Vector3(
                         Mathf.Cos(angle * Mathf.Deg2Rad) * ySpeed * Mathf.Sign(hbDown.normal.x),
                         Mathf.Sin(angle * Mathf.Deg2Rad) * ySpeed * ySign
-                    );
+                    ) * Time.timeScale;
             }
             else if (upCheck && !downCheck)
             {
@@ -165,7 +165,7 @@ namespace JaeminPark.PlatformerKit
             else
             {
                 // Y축 충돌하지 않음
-                transform.position += Vector3.up * velocity.y;
+                transform.position += Vector3.up * velocity.y * Time.timeScale;
             }
 
             // 플랫폼 처리
@@ -259,7 +259,7 @@ namespace JaeminPark.PlatformerKit
                     transform.position += new Vector3(
                             Mathf.Cos(angle * Mathf.Deg2Rad) * xSpeed * xSign,
                             Mathf.Sin(angle * Mathf.Deg2Rad) * xSpeed
-                        );
+                        ) * Time.timeScale;
                 }
                 else
                 {
@@ -288,7 +288,7 @@ namespace JaeminPark.PlatformerKit
                     transform.position += new Vector3(
                             Mathf.Cos(angle * Mathf.Deg2Rad) * xSpeed * xSign,
                             Mathf.Sin(angle * Mathf.Deg2Rad) * xSpeed
-                        );
+                        ) * Time.timeScale;
                 }
                 else
                 {
@@ -301,7 +301,7 @@ namespace JaeminPark.PlatformerKit
             else
             {
                 // X축 충돌하지 않음
-                transform.position += Vector3.right * velocity.x;
+                transform.position += Vector3.right * velocity.x * Time.timeScale;
             }
 
             PlatformerHit descSlope = coll.RaycastDown(downLayer);
