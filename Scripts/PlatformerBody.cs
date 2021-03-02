@@ -39,7 +39,11 @@ namespace JaeminPark.PlatformerKit
         public delegate void OnStuck(float gap);
         public event OnStuck onVerticalStuck;
         public event OnStuck onHorizontalStuck;
-        
+
+        public delegate void OnPlatform(GameObject platformObject, PlatformBase platform, Direction direction);
+        public event OnPlatform onPlatformEnter;
+        public event OnPlatform onPlatformExit;
+
         private void Awake()
         {
             coll = GetComponent<PlatformerCollider>();
@@ -173,32 +177,38 @@ namespace JaeminPark.PlatformerKit
             {
                 if (upObject != up.gameObject)
                 {
-                    if (upPlatform != null) upPlatform.OnBodyExit(this, PlatformBase.Direction.Up);
+                    if (upPlatform != null) upPlatform.OnBodyExit(this, Direction.Up);
                     upObject = up.gameObject;
                     upPlatform = upObject.GetComponent<PlatformBase>();
-                    if (upPlatform != null) upPlatform.OnBodyEnter(this, PlatformBase.Direction.Up);
+                    if (upPlatform != null) upPlatform.OnBodyEnter(this, Direction.Up);
+
+                    if (onPlatformEnter != null) onPlatformEnter.Invoke(upObject, upPlatform, Direction.Up);
                 }
             }
-            else
+            else if (upObject != null)
             {
-                if (steppingPlatform != null) steppingPlatform.OnBodyExit(this, PlatformBase.Direction.Up);
-                steppingObject = null;
-                steppingPlatform = null;
+                if (onPlatformExit != null) onPlatformExit.Invoke(upObject, upPlatform, Direction.Up);
+                if (upPlatform != null) upPlatform.OnBodyExit(this, Direction.Up);
+                upObject = null;
+                upPlatform = null;
             }
 
             if (downCheck)
             {
                 if (steppingObject != down.gameObject)
                 {
-                    if (steppingPlatform != null) steppingPlatform.OnBodyExit(this, PlatformBase.Direction.Down);
+                    if (steppingPlatform != null) steppingPlatform.OnBodyExit(this, Direction.Down);
                     steppingObject = down.gameObject;
                     steppingPlatform = steppingObject.GetComponent<PlatformBase>();
-                    if (steppingPlatform != null) steppingPlatform.OnBodyEnter(this, PlatformBase.Direction.Down);
+                    if (steppingPlatform != null) steppingPlatform.OnBodyEnter(this, Direction.Down);
+
+                    if (onPlatformEnter != null) onPlatformEnter.Invoke(steppingObject, steppingPlatform, Direction.Down);
                 }
             }
-            else
+            else if (steppingObject != null)
             {
-                if (steppingPlatform != null) steppingPlatform.OnBodyExit(this, PlatformBase.Direction.Down);
+                if (onPlatformExit != null) onPlatformExit.Invoke(steppingObject, steppingPlatform, Direction.Down);
+                if (steppingPlatform != null) steppingPlatform.OnBodyExit(this, Direction.Down);
                 steppingObject = null;
                 steppingPlatform = null;
             }
@@ -319,17 +329,18 @@ namespace JaeminPark.PlatformerKit
             {
                 if (rightObject != right.gameObject)
                 {
-                    if (rightPlatform != null) rightPlatform.OnBodyExit(this, PlatformBase.Direction.Right);
+                    if (rightPlatform != null) rightPlatform.OnBodyExit(this, Direction.Right);
                     rightObject = right.gameObject;
                     rightPlatform = rightObject.GetComponent<PlatformBase>();
-                    if (rightPlatform != null) rightPlatform.OnBodyEnter(this, PlatformBase.Direction.Right);
+                    if (rightPlatform != null) rightPlatform.OnBodyEnter(this, Direction.Right);
 
-                    velocity.y = 0;
+                    if (onPlatformEnter != null) onPlatformEnter.Invoke(rightObject, rightPlatform, Direction.Right);
                 }
             }
-            else
+            else if (rightObject != null)
             {
-                if (rightPlatform != null) rightPlatform.OnBodyExit(this, PlatformBase.Direction.Right);
+                if (onPlatformExit != null) onPlatformExit.Invoke(rightObject, rightPlatform, Direction.Right);
+                if (rightPlatform != null) rightPlatform.OnBodyExit(this, Direction.Right);
                 rightObject = null;
                 rightPlatform = null;
             }
@@ -338,17 +349,18 @@ namespace JaeminPark.PlatformerKit
             {
                 if (leftObject != left.gameObject)
                 {
-                    if (leftPlatform != null) leftPlatform.OnBodyExit(this, PlatformBase.Direction.Left);
+                    if (leftPlatform != null) leftPlatform.OnBodyExit(this, Direction.Left);
                     leftObject = left.gameObject;
                     leftPlatform = leftObject.GetComponent<PlatformBase>();
-                    if (leftPlatform != null) leftPlatform.OnBodyEnter(this, PlatformBase.Direction.Left);
+                    if (leftPlatform != null) leftPlatform.OnBodyEnter(this, Direction.Left);
 
-                    velocity.y = 0;
+                    if (onPlatformEnter != null) onPlatformEnter.Invoke(leftObject, leftPlatform, Direction.Left);
                 }
             }
-            else
+            else if (leftObject != null)
             {
-                if (leftPlatform != null) leftPlatform.OnBodyExit(this, PlatformBase.Direction.Left);
+                if (onPlatformExit != null) onPlatformExit.Invoke(leftObject, leftPlatform, Direction.Left);
+                if (leftPlatform != null) leftPlatform.OnBodyExit(this, Direction.Left);
                 leftObject = null;
                 leftPlatform = null;
             }
@@ -357,13 +369,13 @@ namespace JaeminPark.PlatformerKit
         private void UpdatePlatform()
         {
             if (leftPlatform != null)
-                leftPlatform.OnBodyStay(this, PlatformBase.Direction.Left);
+                leftPlatform.OnBodyStay(this, Direction.Left);
             if (rightPlatform != null)
-                rightPlatform.OnBodyStay(this, PlatformBase.Direction.Right);
+                rightPlatform.OnBodyStay(this, Direction.Right);
             if (steppingPlatform != null)
-                steppingPlatform.OnBodyStay(this, PlatformBase.Direction.Down);
+                steppingPlatform.OnBodyStay(this, Direction.Down);
             if (upPlatform != null)
-                upPlatform.OnBodyStay(this, PlatformBase.Direction.Up);
+                upPlatform.OnBodyStay(this, Direction.Up);
         }
     }
 }
