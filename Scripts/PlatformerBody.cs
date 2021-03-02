@@ -247,7 +247,7 @@ namespace JaeminPark.PlatformerKit
                 {
                     // 끼임
                     transform.position += Mathf.Min(vbRight.distance, 0) * Vector3.right;
-                    velocity.x = 0;
+                    velocity = Vector2.zero;
                 }
                 else if (rightSlopeCheck && right.distance >= -almostZero)
                 {
@@ -265,7 +265,7 @@ namespace JaeminPark.PlatformerKit
                 {
                     // 벽면
                     transform.position += right.distance * Vector3.right;
-                    velocity.x = 0;
+                    velocity = Vector2.zero;
                     rightWall = true;
                 }
             }
@@ -276,7 +276,7 @@ namespace JaeminPark.PlatformerKit
                 {
                     // 끼임
                     transform.position += Mathf.Min(vbLeft.distance, 0) * Vector3.left;
-                    velocity.x = 0;
+                    velocity = Vector2.zero;
                 }
                 else if (leftSlopeCheck && left.distance >= -almostZero)
                 {
@@ -294,7 +294,7 @@ namespace JaeminPark.PlatformerKit
                 {
                     // 벽면
                     transform.position += left.distance * Vector3.left;
-                    velocity.x = 0;
+                    velocity = Vector2.zero;
                     leftWall = true;
                 }
             }
