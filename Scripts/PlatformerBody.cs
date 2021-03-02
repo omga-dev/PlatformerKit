@@ -247,7 +247,7 @@ namespace JaeminPark.PlatformerKit
                 {
                     // 끼임
                     transform.position += Mathf.Min(vbRight.distance, 0) * Vector3.right;
-                    velocity = Vector2.zero;
+                    velocity.x = 0;
                 }
                 else if (rightSlopeCheck && right.distance >= -almostZero)
                 {
@@ -265,7 +265,7 @@ namespace JaeminPark.PlatformerKit
                 {
                     // 벽면
                     transform.position += right.distance * Vector3.right;
-                    velocity = Vector2.zero;
+                    velocity.x = 0;
                     rightWall = true;
                 }
             }
@@ -276,7 +276,7 @@ namespace JaeminPark.PlatformerKit
                 {
                     // 끼임
                     transform.position += Mathf.Min(vbLeft.distance, 0) * Vector3.left;
-                    velocity = Vector2.zero;
+                    velocity.x = 0;
                 }
                 else if (leftSlopeCheck && left.distance >= -almostZero)
                 {
@@ -294,7 +294,7 @@ namespace JaeminPark.PlatformerKit
                 {
                     // 벽면
                     transform.position += left.distance * Vector3.left;
-                    velocity = Vector2.zero;
+                    velocity.x = 0;
                     leftWall = true;
                 }
             }
@@ -323,6 +323,8 @@ namespace JaeminPark.PlatformerKit
                     rightObject = right.gameObject;
                     rightPlatform = rightObject.GetComponent<PlatformBase>();
                     if (rightPlatform != null) rightPlatform.OnBodyEnter(this, PlatformBase.Direction.Right);
+
+                    velocity.y = 0;
                 }
             }
             else
@@ -340,6 +342,8 @@ namespace JaeminPark.PlatformerKit
                     leftObject = left.gameObject;
                     leftPlatform = leftObject.GetComponent<PlatformBase>();
                     if (leftPlatform != null) leftPlatform.OnBodyEnter(this, PlatformBase.Direction.Left);
+
+                    velocity.y = 0;
                 }
             }
             else
