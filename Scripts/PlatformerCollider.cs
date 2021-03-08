@@ -38,6 +38,7 @@ namespace JaeminPark.PlatformerKit
         private Vector2 hbDownLeft, hbLeftDown, hbDownRight, hbRightDown, hbUpLeft, hbLeftUp, hbUpRight, hbRightUp,
             vbDownLeft, vbLeftDown, vbDownRight, vbRightDown, vbUpLeft, vbLeftUp, vbUpRight, vbRightUp,
             pbLeftDown, pbRightDown;
+        
         private Transform tf;
 
         private void Awake()
