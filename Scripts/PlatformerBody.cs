@@ -48,7 +48,7 @@ namespace JaeminPark.PlatformerKit
         {
             coll = GetComponent<PlatformerCollider>();
         }
-        
+
         private void FixedUpdate()
         {
             UpdatePhysics();
@@ -111,7 +111,7 @@ namespace JaeminPark.PlatformerKit
                 float angle = Vector2.Angle(hbUp.normal, Vector2.up);
                 float ySpeed = Mathf.Abs(velocity.y);
                 float ySign = Mathf.Sign(velocity.y);
-                
+
                 transform.position += new Vector3(
                         Mathf.Cos(angle * Mathf.Deg2Rad) * ySpeed * Mathf.Sign(hbUp.normal.x),
                         Mathf.Sin(angle * Mathf.Deg2Rad) * ySpeed * ySign
@@ -324,7 +324,7 @@ namespace JaeminPark.PlatformerKit
             }
 
             // 플랫폼 처리
-            if (rightCheck)
+            if (right.hit && right.distance <= velocity.x + almostZero)
             {
                 if (rightObject != right.gameObject)
                 {
@@ -344,7 +344,7 @@ namespace JaeminPark.PlatformerKit
                 rightPlatform = null;
             }
 
-            if (leftCheck)
+            if (left.hit && left.distance <= -velocity.x + almostZero)
             {
                 if (leftObject != left.gameObject)
                 {
