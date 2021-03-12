@@ -30,6 +30,8 @@ namespace JaeminPark.PlatformerKit
         private Vector2 _verticalHitbox = new Vector2(0.75f, 1f);
         [SerializeField]
         private float _platformCheckOffset = 0.05f;
+        [SerializeField]
+        public float slopeCheckOffset = 0.05f;
 
         public Vector2 horizontalHitbox { get { return _horizontalHitbox; } set { _horizontalHitbox = value; UpdateHBPosition(); } }
         public Vector2 verticalHitbox { get { return _verticalHitbox; } set { _verticalHitbox = value; UpdateVBPosition(); } }

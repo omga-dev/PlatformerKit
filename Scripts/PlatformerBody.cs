@@ -13,7 +13,6 @@ namespace JaeminPark.PlatformerKit
 
         // Very low number that should be treated as 0 threshold
         public const float almostZero = 0.01f;
-        public const float slopeDescendDistance = 0.1f;
         public const float raycastUnit = 0.05f;
 
         protected PlatformerCollider coll;
@@ -314,7 +313,7 @@ namespace JaeminPark.PlatformerKit
             }
 
             PlatformerHit descSlope = coll.RaycastDown(downLayer);
-            bool descSlopeHit = descSlope.hit && descSlope.distance <= slopeDescendDistance && velocity.y == 0;
+            bool descSlopeHit = descSlope.hit && descSlope.distance <= coll.slopeCheckOffset && velocity.y == 0;
 
             if (descSlopeHit && !(leftStuck && rightStuck))
             {
