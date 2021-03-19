@@ -85,61 +85,61 @@ namespace JaeminPark.PlatformerKit
             pbRightDown = _verticalHitbox * new Vector2(0.5f, -0.5f) - Vector2.down * _platformCheckOffset;
         }
 
-        public PlatformerHit RaycastLeft(LayerMask layer)
+        public PlatformerHit RaycastLeft(LayerMask layer, float distance)
         {
             Vector2 pos = tf.position;
-            return Raycast(pos + hbDownLeft, pos + hbUpLeft, _horizontalHitbox.x / 2, Vector2.left, layer);
+            return Raycast(pos + hbDownLeft, pos + hbUpLeft, _horizontalHitbox.x / 2, distance, Vector2.left, layer);
         }
 
-        public PlatformerHit RaycastRight(LayerMask layer)
+        public PlatformerHit RaycastRight(LayerMask layer, float distance)
         {
             Vector2 pos = tf.position;
-            return Raycast(pos + hbDownRight, pos + hbUpRight, _horizontalHitbox.x / 2, Vector2.right, layer);
+            return Raycast(pos + hbDownRight, pos + hbUpRight, _horizontalHitbox.x / 2, distance, Vector2.right, layer);
         }
 
-        public PlatformerHit RaycastVbLeft(LayerMask layer)
+        public PlatformerHit RaycastVbLeft(LayerMask layer, float distance)
         {
             Vector2 pos = tf.position;
-            return Raycast(pos + vbDownLeft, pos + vbUpLeft, _verticalHitbox.x, Vector2.left, layer);
+            return Raycast(pos + vbDownLeft, pos + vbUpLeft, _verticalHitbox.x, distance, Vector2.left, layer);
         }
 
-        public PlatformerHit RaycastVbRight(LayerMask layer)
+        public PlatformerHit RaycastVbRight(LayerMask layer, float distance)
         {
             Vector2 pos = tf.position;
-            return Raycast(pos + vbDownRight, pos + vbUpRight, _verticalHitbox.x, Vector2.right, layer);
+            return Raycast(pos + vbDownRight, pos + vbUpRight, _verticalHitbox.x, distance, Vector2.right, layer);
         }
 
-        public PlatformerHit RaycastDown(LayerMask layer)
+        public PlatformerHit RaycastDown(LayerMask layer, float distance)
         {
             Vector2 pos = tf.position;
-            return Raycast(pos + vbLeftDown, pos + vbRightDown, _verticalHitbox.y / 2, Vector2.down, layer);
+            return Raycast(pos + vbLeftDown, pos + vbRightDown, _verticalHitbox.y / 2, distance, Vector2.down, layer);
         }
 
-        public PlatformerHit RaycastUp(LayerMask layer)
+        public PlatformerHit RaycastUp(LayerMask layer, float distance)
         {
             Vector2 pos = tf.position;
-            return Raycast(pos + vbLeftUp, pos + vbRightUp, _verticalHitbox.y / 2, Vector2.up, layer);
+            return Raycast(pos + vbLeftUp, pos + vbRightUp, _verticalHitbox.y / 2, distance, Vector2.up, layer);
         }
 
-        public PlatformerHit RaycastHbDown(LayerMask layer)
+        public PlatformerHit RaycastHbDown(LayerMask layer, float distance)
         {
             Vector2 pos = tf.position;
-            return Raycast(pos + hbLeftDown, pos + hbRightDown, _horizontalHitbox.y, Vector2.down, layer);
+            return Raycast(pos + hbLeftDown, pos + hbRightDown, _horizontalHitbox.y, distance, Vector2.down, layer);
         }
 
-        public PlatformerHit RaycastHbUp(LayerMask layer)
+        public PlatformerHit RaycastHbUp(LayerMask layer, float distance)
         {
             Vector2 pos = tf.position;
-            return Raycast(pos + hbLeftUp, pos + hbRightUp, _horizontalHitbox.y, Vector2.up, layer);
+            return Raycast(pos + hbLeftUp, pos + hbRightUp, _horizontalHitbox.y, distance, Vector2.up, layer);
         }
 
-        public PlatformerHit RaycastPbDown(LayerMask layer)
+        public PlatformerHit RaycastPbDown(LayerMask layer, float distance)
         {
             Vector2 pos = tf.position;
-            return Raycast(pos + pbLeftDown, pos + pbRightDown, _horizontalHitbox.y - platformCheckOffset, Vector2.down, layer, false);
+            return Raycast(pos + pbLeftDown, pos + pbRightDown, _horizontalHitbox.y - platformCheckOffset, distance, Vector2.down, layer, false);
         }
 
-        public PlatformerHit Raycast(Vector2 from, Vector2 to, float skin, Vector2 dir, LayerMask layer, bool ignoreZeroDistance = true)
+        public PlatformerHit Raycast(Vector2 from, Vector2 to, float skin, float distance, Vector2 dir, LayerMask layer, bool ignoreZeroDistance = true)
         {
             if (!enabled)
                 return PlatformerHit.NoHit;
@@ -155,7 +155,7 @@ namespace JaeminPark.PlatformerKit
             {
                 float r = i / (float)count;
                 Vector2 origin = Vector2.Lerp(from, to, r);
-                PlatformerHit hit = Raycast(origin, skin, dir, layer, ignoreZeroDistance);
+                PlatformerHit hit = Raycast(origin, skin, distance, dir, layer, ignoreZeroDistance);
                 if (hit.hit && hit.distance <= min.distance)
                 {
                     min = hit;
@@ -165,9 +165,12 @@ namespace JaeminPark.PlatformerKit
             return min;
         }
 
-        public PlatformerHit Raycast(Vector2 origin, float skin, Vector2 dir, LayerMask layer, bool ignoreZeroDistance)
+        public PlatformerHit Raycast(Vector2 origin, float skin, float distance, Vector2 dir, LayerMask layer, bool ignoreZeroDistance)
         {
-            RaycastHit2D hit = Physics2D.Raycast(origin - dir * skin, dir, Mathf.Infinity, layer);
+            if (distance < PlatformerBody.almostZero)
+                distance = PlatformerBody.almostZero;
+
+            RaycastHit2D hit = Physics2D.Raycast(origin - dir * skin, dir, distance + skin, layer);
             if (hit && (!ignoreZeroDistance || hit.distance > PlatformerBody.almostZero))
                 return new PlatformerHit(true, hit.distance - skin, hit.normal, hit.transform.gameObject);
             else
@@ -185,6 +188,7 @@ namespace JaeminPark.PlatformerKit
                 Debug.DrawLine(position + _verticalHitbox * box[i], position + _verticalHitbox * box[(i + 1) % 4], new Color(0.694f, 0.992f, 0.349f));
 
             Debug.DrawLine(position + _verticalHitbox * box[0] - Vector2.down * _platformCheckOffset, position + _verticalHitbox * box[1] - Vector2.down * _platformCheckOffset, new Color(0.694f, 0.992f, 0.349f));
+            Debug.DrawLine(position + _verticalHitbox * box[0] + Vector2.down * slopeCheckOffset, position + _verticalHitbox * box[1] + Vector2.down * slopeCheckOffset, new Color(0.694f, 0.992f, 0.349f));
         }
 #endif
     }

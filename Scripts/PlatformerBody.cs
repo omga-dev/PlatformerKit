@@ -68,13 +68,13 @@ namespace JaeminPark.PlatformerKit
 
         protected void UpdateYAxis()
         {
-            PlatformerHit pbDown = coll.RaycastPbDown(platformLayer);
+            PlatformerHit pbDown = coll.RaycastPbDown(platformLayer, -velocity.y);
             LayerMask downLayer = (pbDown.hit && pbDown.distance < almostZero) ? solidLayer : (LayerMask)(solidLayer + platformLayer);
 
-            PlatformerHit up = coll.RaycastUp(solidLayer);
-            PlatformerHit down = coll.RaycastDown(downLayer);
-            PlatformerHit hbUp = coll.RaycastHbUp(solidLayer);
-            PlatformerHit hbDown = coll.RaycastHbDown(downLayer);
+            PlatformerHit up = coll.RaycastUp(solidLayer, velocity.y);
+            PlatformerHit down = coll.RaycastDown(downLayer, -velocity.y);
+            PlatformerHit hbUp = coll.RaycastHbUp(solidLayer, velocity.y);
+            PlatformerHit hbDown = coll.RaycastHbDown(downLayer, -velocity.y);
 
             bool upCheck = (up.hit && up.distance <= velocity.y || upStuck && !downStuck) && velocity.y > gravity.y;
             bool downCheck = (down.hit && down.distance <= -velocity.y || downStuck && !upStuck) && velocity.y <= -gravity.y;
@@ -155,8 +155,8 @@ namespace JaeminPark.PlatformerKit
                 {
                     transform.position += down.distance * Vector3.down;
 
-                    PlatformerHit left = coll.RaycastLeft(solidLayer);
-                    PlatformerHit right = coll.RaycastRight(solidLayer);
+                    PlatformerHit left = coll.RaycastLeft(solidLayer, -velocity.x);
+                    PlatformerHit right = coll.RaycastRight(solidLayer, velocity.x);
                     if ((!right.hit || right.distance >= -almostZero) && (!left.hit || left.distance >= -almostZero))
                     {
                         velocity.y = 0;
@@ -214,13 +214,18 @@ namespace JaeminPark.PlatformerKit
 
         protected void UpdateXAxis()
         {
-            PlatformerHit pbDown = coll.RaycastPbDown(platformLayer);
+            float upCheckDist = Mathf.Max(velocity.y, almostZero);
+            float downCheckDist = Mathf.Max(-velocity.y, almostZero);
+            float rightCheckDist = Mathf.Max(velocity.x, almostZero);
+            float leftCheckDist = Mathf.Max(-velocity.x, almostZero);
+
+            PlatformerHit pbDown = coll.RaycastPbDown(platformLayer, -velocity.y);
             LayerMask downLayer = (pbDown.hit && pbDown.distance < almostZero) ? solidLayer : (LayerMask)(solidLayer + platformLayer);
 
-            PlatformerHit left = coll.RaycastLeft(solidLayer);
-            PlatformerHit right = coll.RaycastRight(solidLayer);
-            PlatformerHit vbLeft = coll.RaycastVbLeft(downLayer);
-            PlatformerHit vbRight = coll.RaycastVbRight(downLayer);
+            PlatformerHit left = coll.RaycastLeft(solidLayer, -velocity.x);
+            PlatformerHit right = coll.RaycastRight(solidLayer, velocity.x);
+            PlatformerHit vbLeft = coll.RaycastVbLeft(downLayer, -velocity.x);
+            PlatformerHit vbRight = coll.RaycastVbRight(downLayer, velocity.x);
 
             bool rightCheck = (right.hit && right.distance <= velocity.x || rightStuck && !leftStuck) && velocity.x >= -almostZero;
             bool leftCheck = (left.hit && left.distance <= -velocity.x || leftStuck && !rightStuck) && velocity.x <= almostZero;
@@ -312,7 +317,7 @@ namespace JaeminPark.PlatformerKit
                 transform.position += Vector3.right * velocity.x * Time.timeScale;
             }
 
-            PlatformerHit descSlope = coll.RaycastDown(downLayer);
+            PlatformerHit descSlope = coll.RaycastDown(downLayer, coll.slopeCheckOffset);
             bool descSlopeHit = descSlope.hit && descSlope.distance <= coll.slopeCheckOffset && velocity.y == 0;
 
             if (descSlopeHit && !(leftStuck && rightStuck))
