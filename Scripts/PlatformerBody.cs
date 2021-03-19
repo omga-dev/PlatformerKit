@@ -13,7 +13,6 @@ namespace JaeminPark.PlatformerKit
 
         // Very low number that should be treated as 0 threshold
         public const float almostZero = 0.01f;
-        public const float raycastUnit = 0.05f;
 
         protected PlatformerCollider coll;
         public bool downWall { get; private set; }
