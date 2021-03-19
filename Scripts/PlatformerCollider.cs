@@ -139,38 +139,26 @@ namespace JaeminPark.PlatformerKit
             return Raycast(pos + pbLeftDown, pos + pbRightDown, _horizontalHitbox.y - platformCheckOffset, distance, Vector2.down, layer, false);
         }
 
-        public PlatformerHit Raycast(Vector2 from, Vector2 to, float skin, float distance, Vector2 dir, LayerMask layer, bool ignoreZeroDistance = true)
+        private PlatformerHit Raycast(Vector2 from, Vector2 to, float skin, float distance, Vector2 dir, LayerMask layer, bool ignoreZeroDistance = true)
         {
-            if (!enabled)
-                return PlatformerHit.NoHit;
+            Vector2 boxOrigin = (from + to) / 2 - dir * skin;
+            Vector2 boxSize = new Vector2(Mathf.Abs(to.x - from.x), Mathf.Abs(to.y - from.y));
 
-            int count = Mathf.CeilToInt((from - to).magnitude / PlatformerBody.raycastUnit);
-
-            PlatformerHit min = PlatformerHit.NoHit;
-
-            if (dir == Vector2.zero)
-                return min;
-
-            for (int i = 0; i <= count; i++)
+            if (boxSize.x == 0)
             {
-                float r = i / (float)count;
-                Vector2 origin = Vector2.Lerp(from, to, r);
-                PlatformerHit hit = Raycast(origin, skin, distance, dir, layer, ignoreZeroDistance);
-                if (hit.hit && hit.distance <= min.distance)
-                {
-                    min = hit;
-                }
+                boxSize.x = PlatformerBody.almostZero;
+                boxOrigin.x -= Mathf.Sign(dir.x) * PlatformerBody.almostZero / 2;
             }
 
-            return min;
-        }
+            if (boxSize.y == 0)
+            {
+                boxSize.y = PlatformerBody.almostZero;
+                boxOrigin.y -= Mathf.Sign(dir.y) * PlatformerBody.almostZero / 2;
+            }
 
-        public PlatformerHit Raycast(Vector2 origin, float skin, float distance, Vector2 dir, LayerMask layer, bool ignoreZeroDistance)
-        {
-            if (distance < PlatformerBody.almostZero)
-                distance = PlatformerBody.almostZero;
+            Debug.Log(boxOrigin + " " + boxSize + " " + dir);
+            RaycastHit2D hit = Physics2D.BoxCast(boxOrigin, boxSize, 0f, dir, distance + skin, layer);
 
-            RaycastHit2D hit = Physics2D.Raycast(origin - dir * skin, dir, distance + skin, layer);
             if (hit && (!ignoreZeroDistance || hit.distance > PlatformerBody.almostZero))
                 return new PlatformerHit(true, hit.distance - skin, hit.normal, hit.transform.gameObject);
             else
