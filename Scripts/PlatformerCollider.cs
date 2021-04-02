@@ -6,10 +6,10 @@ namespace JaeminPark.PlatformerKit
 {
     public struct PlatformerHit
     {
-        public bool hit;
-        public float distance;
-        public Vector2 normal;
-        public GameObject gameObject;
+        public bool hit { get; private set; }
+        public float distance { get; private set; }
+        public Vector2 normal { get; private set; }
+        public GameObject gameObject { get; private set; }
         public readonly static PlatformerHit NoHit = new PlatformerHit(false, Mathf.Infinity, Vector2.zero, null);
 
         public PlatformerHit(bool hit, float distance, Vector2 normal, GameObject gameObject)
@@ -31,11 +31,12 @@ namespace JaeminPark.PlatformerKit
         [SerializeField]
         private float _platformCheckOffset = 0.05f;
         [SerializeField]
-        public float slopeCheckOffset = 0.05f;
+        private float _slopeCheckOffset = 0.05f;
 
         public Vector2 horizontalHitbox { get { return _horizontalHitbox; } set { _horizontalHitbox = value; UpdateHBPosition(); } }
         public Vector2 verticalHitbox { get { return _verticalHitbox; } set { _verticalHitbox = value; UpdateVBPosition(); } }
         public float platformCheckOffset { get { return _platformCheckOffset; } set { _platformCheckOffset = value; UpdatePBPosition(); } }
+        public float slopeCheckOffset { get { return _slopeCheckOffset; } set { _slopeCheckOffset = value; } }
 
         private Vector2 hbDownLeft, hbLeftDown, hbDownRight, hbRightDown, hbUpLeft, hbLeftUp, hbUpRight, hbRightUp,
             vbDownLeft, vbLeftDown, vbDownRight, vbRightDown, vbUpLeft, vbLeftUp, vbUpRight, vbRightUp,
@@ -67,7 +68,7 @@ namespace JaeminPark.PlatformerKit
             hbRightUp = _horizontalHitbox * new Vector2(0.5f, 0.5f) - Vector2.right * 0.01f;
         }
 
-        public void UpdateVBPosition()
+        private void UpdateVBPosition()
         {
             vbDownLeft = _verticalHitbox * new Vector2(-0.5f, -0.5f) - Vector2.down * 0.01f;
             vbLeftDown = _verticalHitbox * new Vector2(-0.5f, -0.5f);
@@ -79,67 +80,67 @@ namespace JaeminPark.PlatformerKit
             vbRightUp = _verticalHitbox * new Vector2(0.5f, 0.5f);
         }
 
-        public void UpdatePBPosition()
+        private void UpdatePBPosition()
         {
             pbLeftDown = _verticalHitbox * new Vector2(-0.5f, -0.5f) - Vector2.down * _platformCheckOffset;
             pbRightDown = _verticalHitbox * new Vector2(0.5f, -0.5f) - Vector2.down * _platformCheckOffset;
         }
 
-        public PlatformerHit RaycastLeft(LayerMask layer, float distance)
+        internal PlatformerHit RaycastLeft(LayerMask layer, float distance)
         {
             Vector2 pos = tf.position;
             return Raycast(pos + hbDownLeft, pos + hbUpLeft, _horizontalHitbox.x / 2, distance, Vector2.left, layer);
         }
 
-        public PlatformerHit RaycastRight(LayerMask layer, float distance)
+        internal PlatformerHit RaycastRight(LayerMask layer, float distance)
         {
             Vector2 pos = tf.position;
             return Raycast(pos + hbDownRight, pos + hbUpRight, _horizontalHitbox.x / 2, distance, Vector2.right, layer);
         }
 
-        public PlatformerHit RaycastVbLeft(LayerMask layer, float distance)
+        internal PlatformerHit RaycastVbLeft(LayerMask layer, float distance)
         {
             Vector2 pos = tf.position;
             return Raycast(pos + vbDownLeft, pos + vbUpLeft, _verticalHitbox.x, distance, Vector2.left, layer);
         }
 
-        public PlatformerHit RaycastVbRight(LayerMask layer, float distance)
+        internal PlatformerHit RaycastVbRight(LayerMask layer, float distance)
         {
             Vector2 pos = tf.position;
             return Raycast(pos + vbDownRight, pos + vbUpRight, _verticalHitbox.x, distance, Vector2.right, layer);
         }
 
-        public PlatformerHit RaycastDown(LayerMask layer, float distance)
+        internal PlatformerHit RaycastDown(LayerMask layer, float distance)
         {
             Vector2 pos = tf.position;
             return Raycast(pos + vbLeftDown, pos + vbRightDown, _verticalHitbox.y / 2, distance, Vector2.down, layer);
         }
 
-        public PlatformerHit RaycastUp(LayerMask layer, float distance)
+        internal PlatformerHit RaycastUp(LayerMask layer, float distance)
         {
             Vector2 pos = tf.position;
             return Raycast(pos + vbLeftUp, pos + vbRightUp, _verticalHitbox.y / 2, distance, Vector2.up, layer);
         }
 
-        public PlatformerHit RaycastHbDown(LayerMask layer, float distance)
+        internal PlatformerHit RaycastHbDown(LayerMask layer, float distance)
         {
             Vector2 pos = tf.position;
             return Raycast(pos + hbLeftDown, pos + hbRightDown, _horizontalHitbox.y, distance, Vector2.down, layer);
         }
 
-        public PlatformerHit RaycastHbUp(LayerMask layer, float distance)
+        internal PlatformerHit RaycastHbUp(LayerMask layer, float distance)
         {
             Vector2 pos = tf.position;
             return Raycast(pos + hbLeftUp, pos + hbRightUp, _horizontalHitbox.y, distance, Vector2.up, layer);
         }
 
-        public PlatformerHit RaycastPbDown(LayerMask layer, float distance)
+        internal PlatformerHit RaycastPbDown(LayerMask layer, float distance)
         {
             Vector2 pos = tf.position;
             return Raycast(pos + pbLeftDown, pos + pbRightDown, _horizontalHitbox.y - platformCheckOffset, distance, Vector2.down, layer, false);
         }
 
-        public PlatformerHit Raycast(Vector2 from, Vector2 to, float skin, float distance, Vector2 dir, LayerMask layer, bool ignoreZeroDistance = true)
+        private PlatformerHit Raycast(Vector2 from, Vector2 to, float skin, float distance, Vector2 dir, LayerMask layer, bool ignoreZeroDistance = true)
         {
             if (!enabled)
                 return PlatformerHit.NoHit;
@@ -165,7 +166,7 @@ namespace JaeminPark.PlatformerKit
             return min;
         }
 
-        public PlatformerHit Raycast(Vector2 origin, float skin, float distance, Vector2 dir, LayerMask layer, bool ignoreZeroDistance)
+        private PlatformerHit Raycast(Vector2 origin, float skin, float distance, Vector2 dir, LayerMask layer, bool ignoreZeroDistance)
         {
             if (distance < PlatformerBody.almostZero)
                 distance = PlatformerBody.almostZero;
