@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace JaeminPark.PlatformerKit
 {
-    public struct PlatformerHit
+    internal struct PlatformerHit
     {
         public bool hit { get; private set; }
         public float distance { get; private set; }
@@ -33,9 +33,24 @@ namespace JaeminPark.PlatformerKit
         [SerializeField]
         private float _slopeCheckOffset = 0.05f;
 
+        /// <summary>
+        /// Hitbox on checking Y axis.
+        /// </summary>
         public Vector2 horizontalHitbox { get { return _horizontalHitbox; } set { _horizontalHitbox = value; UpdateHBPosition(); } }
+
+        /// <summary>
+        /// Hitbox on checking Y axis.
+        /// </summary>
         public Vector2 verticalHitbox { get { return _verticalHitbox; } set { _verticalHitbox = value; UpdateVBPosition(); } }
+
+        /// <summary>
+        /// Hitbox on checking Y axis.
+        /// </summary>
         public float platformCheckOffset { get { return _platformCheckOffset; } set { _platformCheckOffset = value; UpdatePBPosition(); } }
+
+        /// <summary>
+        /// Hitbox on checking Y axis.
+        /// </summary>
         public float slopeCheckOffset { get { return _slopeCheckOffset; } set { _slopeCheckOffset = value; } }
 
         private Vector2 hbDownLeft, hbLeftDown, hbDownRight, hbRightDown, hbUpLeft, hbLeftUp, hbUpRight, hbRightUp,

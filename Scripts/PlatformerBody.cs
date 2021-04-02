@@ -5,43 +5,164 @@ namespace JaeminPark.PlatformerKit
     [RequireComponent(typeof(PlatformerCollider)), AddComponentMenu("Platformer Kit/Platformer Body")]
     public class PlatformerBody : MonoBehaviour
     {
+        /// <summary>
+        /// Linear velocity of the body per frame.
+        /// </summary>
         [HideInInspector]
         public Vector2 velocity;
+
+        /// <summary>
+        /// Gravity applied to the body every frame.
+        /// </summary>
         public Vector2 gravity = new Vector2(0, -0.02f);
+
+        /// <summary>
+        /// LayerMask for detecting Solid.
+        /// </summary>
         public LayerMask solidLayer;
+
+        /// <summary>
+        /// LayerMask for detecting Platform: Solid that is detected only when player is falling.
+        /// </summary>
         public LayerMask platformLayer;
 
-        // Very low number that should be treated as 0 threshold
+        /// <summary>
+        /// Velocity less than this value is treated the same with 0.
+        /// </summary>
         public const float almostZero = 0.01f;
-        public const float raycastUnit = 0.05f;
+
+        internal const float raycastUnit = 0.05f;
 
         protected PlatformerCollider coll;
-        public bool downWall { get; private set; }
-        public bool upWall { get; private set; }
-        public bool leftWall { get; private set; }
-        public bool rightWall { get; private set; }
-        public bool leftStuck { get; private set; }
-        public bool rightStuck { get; private set; }
-        public bool downStuck { get; private set; }
-        public bool upStuck { get; private set; }
-        public bool isGround { get { return downWall || downStuck; } }
 
+        /// <summary>
+        /// Whether this body is detecting a collision on its left side.
+        /// </summary>
+        public bool isLeftWall { get; private set; }
+
+        /// <summary>
+        /// Whether this body is detecting a collision on its right side.
+        /// </summary>
+        public bool isRightWall { get; private set; }
+
+        /// <summary>
+        /// Whether this body is detecting a collision on its bottom side.
+        /// </summary>
+        public bool isDownWall { get; private set; }
+
+        /// <summary>
+        /// Whether this body is detecting a collision on its upper side.
+        /// </summary>
+        public bool isUpWall { get; private set; }
+
+        /// <summary>
+        /// Whether this body is detecting a sandwiching on its left side.
+        /// </summary>
+        public bool isLeftSandwich { get; private set; }
+
+        /// <summary>
+        /// Whether this body is detecting a sandwiching on its right side.
+        /// </summary>
+        public bool isRightSandwich { get; private set; }
+
+        /// <summary>
+        /// A gap between two colliders horizontally sandwiching the body. (Mathf.Infinity when body's not detecting a sandwich.)
+        /// </summary>
+        public float horizontalSandwichGap { get; private set; }
+
+        /// <summary>
+        /// Whether this body is detecting a sandwiching on its bottom side.
+        /// </summary>
+        public bool isDownSandwich { get; private set; }
+
+        /// <summary>
+        /// Whether this body is detecting a sandwiching on its upper side.
+        /// </summary>
+        public bool isUpSandwich { get; private set; }
+
+        /// <summary>
+        /// A gap between two colliders vertically sandwiching the body. (Mathf.Infinity when body's not detecting a sandwich.)
+        /// </summary>
+        public float verticalSandwichGap { get; private set; }
+
+        /// <summary>
+        /// Whether this body is standing on a ground.
+        /// </summary>
+        public bool isGround { get { return isDownWall || isDownSandwich; } }
+
+        /// <summary>
+        /// GameObject being detected on its left side.
+        /// </summary>
         public GameObject leftObject { get; private set; }
+
+        /// <summary>
+        /// PlatformBase being detected on its left side.
+        /// </summary>
         public PlatformBase leftPlatform { get; private set; }
+
+        /// <summary>
+        /// GameObject being detected on its right side.
+        /// </summary>
         public GameObject rightObject { get; private set; }
+
+        /// <summary>
+        /// PlatformBase being detected on its right side.
+        /// </summary>
         public PlatformBase rightPlatform { get; private set; }
+
+        /// <summary>
+        /// GameObject being detected on its bottom side.
+        /// </summary>
+        public GameObject downObject { get; private set; }
+
+        /// <summary>
+        /// PlatformBase being detected on its bottom side.
+        /// </summary>
+        public PlatformBase downPlatform { get; private set; }
+
+        /// <summary>
+        /// GameObject being detected on its upper side.
+        /// </summary>
         public GameObject upObject { get; private set; }
+
+        /// <summary>
+        /// PlatformBase being detected on its upper side.
+        /// </summary>
         public PlatformBase upPlatform { get; private set; }
-        public GameObject steppingObject { get; private set; }
-        public PlatformBase steppingPlatform { get; private set; }
+        
+        /// <summary>
+        /// Delegate of the event called when the body's being sandwiched.
+        /// </summary>
+        /// <param name="gap">Gap between two sandwiching collider.</param>
+        public delegate void SandwichEvent(float gap);
 
-        public delegate void OnStuck(float gap);
-        public event OnStuck onVerticalStuck;
-        public event OnStuck onHorizontalStuck;
+        /// <summary>
+        /// Event called when the body's being sandwiched vertically.
+        /// </summary>
+        public event SandwichEvent onVerticalSandwich;
 
-        public delegate void OnPlatform(GameObject platformObject, PlatformBase platform, Direction direction);
-        public event OnPlatform onPlatformEnter;
-        public event OnPlatform onPlatformExit;
+        /// <summary>
+        /// Event called when the body's being sandwiched horizontally.
+        /// </summary>
+        public event SandwichEvent onHorizontalSandwich;
+        
+        /// <summary>
+        /// Delegate of the event called when the body has entered or exited from a platform collision.
+        /// </summary>
+        /// <param name="platformObject">detected GameObject.</param>
+        /// <param name="platform">detected PlatformBase.</param>
+        /// <param name="direction">Direction of collision. (e.g. Direction.Down when body's stepping on it.)</param>
+        public delegate void PlatformEvent(GameObject platformObject, PlatformBase platform, Direction direction);
+
+        /// <summary>
+        /// Event called when the body has entered a platform collision.
+        /// </summary>
+        public event PlatformEvent onPlatformEnter;
+
+        /// <summary>
+        /// Event called when the body has exited from a platform collision.
+        /// </summary>
+        public event PlatformEvent onPlatformExit;
 
         private void Awake()
         {
@@ -76,15 +197,16 @@ namespace JaeminPark.PlatformerKit
             PlatformerHit hbUp = coll.RaycastHbUp(solidLayer, velocity.y);
             PlatformerHit hbDown = coll.RaycastHbDown(downLayer, -velocity.y);
 
-            bool upCheck = (up.hit && up.distance <= velocity.y || upStuck && !downStuck) && velocity.y > gravity.y;
-            bool downCheck = (down.hit && down.distance <= -velocity.y || downStuck && !upStuck) && velocity.y <= -gravity.y;
+            bool upCheck = (up.hit && up.distance <= velocity.y || isUpSandwich && !isDownSandwich) && velocity.y > gravity.y;
+            bool downCheck = (down.hit && down.distance <= -velocity.y || isDownSandwich && !isUpSandwich) && velocity.y <= -gravity.y;
             bool upSlopeCheck = (hbUp.hit && hbUp.distance <= velocity.y && Mathf.Abs(hbUp.normal.x) > almostZero) && velocity.y > almostZero;
             bool downSlopeCheck = (hbDown.hit && hbDown.distance <= -velocity.y && Mathf.Abs(hbDown.normal.x) > almostZero) && velocity.y < -almostZero;
 
-            downWall = false;
-            upWall = false;
-            rightStuck = false;
-            leftStuck = false;
+            isDownWall = false;
+            isUpWall = false;
+            isRightSandwich = false;
+            isLeftSandwich = false;
+            verticalSandwichGap = 0;
 
             float stickThreshold = Mathf.Sin(Vector2.Angle(Vector2.up, down.normal) * Mathf.Deg2Rad) * Mathf.Abs(velocity.x);
             if (up.hit && up.distance <= stickThreshold && down.hit && down.distance <= stickThreshold)
@@ -92,15 +214,16 @@ namespace JaeminPark.PlatformerKit
                 // 오른쪽, 왼쪽 끼임
                 float stuckNormal = (up.normal.normalized + down.normal.normalized).normalized.x;
                 if (stuckNormal < 0)
-                    rightStuck = true;
+                    isRightSandwich = true;
                 else if (stuckNormal > 0)
-                    leftStuck = true;
+                    isLeftSandwich = true;
                 else
-                    rightStuck = leftStuck = true;
+                    isRightSandwich = isLeftSandwich = true;
 
                 transform.position += Vector3.up * (up.distance - down.distance) / 2;
-
-                onVerticalStuck?.Invoke(coll.verticalHitbox.y + up.distance + down.distance);
+                
+                onVerticalSandwich?.Invoke(coll.verticalHitbox.y + up.distance + down.distance);
+                verticalSandwichGap = coll.verticalHitbox.y + up.distance + down.distance;
 
                 velocity.y = 0;
             }
@@ -131,7 +254,7 @@ namespace JaeminPark.PlatformerKit
             else if (upCheck && !downCheck)
             {
                 // Y축 위 충돌
-                if (upStuck && !downStuck)
+                if (isUpSandwich && !isDownSandwich)
                 {
                     transform.position += Mathf.Min(hbUp.distance, 0) * Vector3.up;
                     velocity.y = 0;
@@ -139,14 +262,14 @@ namespace JaeminPark.PlatformerKit
                 else
                 {
                     transform.position += up.distance * Vector3.up;
-                    upWall = true;
+                    isUpWall = true;
                     velocity.y = 0;
                 }
             }
             else if (downCheck && !upCheck)
             {
                 // Y축 아래 충돌
-                if (downStuck && !upStuck)
+                if (isDownSandwich && !isUpSandwich)
                 {
                     transform.position += Mathf.Min(hbDown.distance, 0) * Vector3.down;
                     velocity.y = 0;
@@ -160,7 +283,7 @@ namespace JaeminPark.PlatformerKit
                     if ((!right.hit || right.distance >= -almostZero) && (!left.hit || left.distance >= -almostZero))
                     {
                         velocity.y = 0;
-                        downWall = true;
+                        isDownWall = true;
                     }
                 }
             }
@@ -193,22 +316,22 @@ namespace JaeminPark.PlatformerKit
 
             if (downCheck)
             {
-                if (steppingObject != down.gameObject)
+                if (downObject != down.gameObject)
                 {
-                    steppingPlatform?.OnBodyExit(this, Direction.Down);
-                    steppingObject = down.gameObject;
-                    steppingPlatform = steppingObject.GetComponent<PlatformBase>();
-                    steppingPlatform?.OnBodyEnter(this, Direction.Down);
+                    downPlatform?.OnBodyExit(this, Direction.Down);
+                    downObject = down.gameObject;
+                    downPlatform = downObject.GetComponent<PlatformBase>();
+                    downPlatform?.OnBodyEnter(this, Direction.Down);
 
-                    onPlatformEnter?.Invoke(steppingObject, steppingPlatform, Direction.Down);
+                    onPlatformEnter?.Invoke(downObject, downPlatform, Direction.Down);
                 }
             }
-            else if (steppingObject)
+            else if (downObject)
             {
-                onPlatformExit?.Invoke(steppingObject, steppingPlatform, Direction.Down);
-                steppingPlatform?.OnBodyExit(this, Direction.Down);
-                steppingObject = null;
-                steppingPlatform = null;
+                onPlatformExit?.Invoke(downObject, downPlatform, Direction.Down);
+                downPlatform?.OnBodyExit(this, Direction.Down);
+                downObject = null;
+                downPlatform = null;
             }
         }
 
@@ -227,36 +350,37 @@ namespace JaeminPark.PlatformerKit
             PlatformerHit vbLeft = coll.RaycastVbLeft(downLayer, -velocity.x);
             PlatformerHit vbRight = coll.RaycastVbRight(downLayer, velocity.x);
 
-            bool rightCheck = (right.hit && right.distance <= velocity.x || rightStuck && !leftStuck) && velocity.x >= -almostZero;
-            bool leftCheck = (left.hit && left.distance <= -velocity.x || leftStuck && !rightStuck) && velocity.x <= almostZero;
+            bool rightCheck = (right.hit && right.distance <= velocity.x || isRightSandwich && !isLeftSandwich) && velocity.x >= -almostZero;
+            bool leftCheck = (left.hit && left.distance <= -velocity.x || isLeftSandwich && !isRightSandwich) && velocity.x <= almostZero;
             bool rightSlopeCheck = (vbRight.hit && vbRight.distance <= velocity.x) && velocity.x > almostZero;
             bool leftSlopeCheck = (vbLeft.hit && vbLeft.distance <= -velocity.x) && velocity.x < -almostZero;
 
-            leftWall = false;
-            rightWall = false;
-            upStuck = false;
-            downStuck = false;
+            isLeftWall = false;
+            isRightWall = false;
+            isUpSandwich = false;
+            isDownSandwich = false;
+            horizontalSandwichGap = 0;
 
             if (right.hit && right.distance <= 0 && left.hit && left.distance <= 0)
             {
                 // 위, 아래 끼임
                 float stuckNormal = (left.normal.normalized + right.normal.normalized).normalized.y;
                 if (stuckNormal < 0)
-                    upStuck = true;
+                    isUpSandwich = true;
                 else if (stuckNormal > 0)
-                    downStuck = true;
+                    isDownSandwich = true;
                 else
-                    upStuck = downStuck = true;
-
-                if (onHorizontalStuck != null)
-                    onHorizontalStuck.Invoke(coll.horizontalHitbox.x + right.distance + left.distance);
+                    isUpSandwich = isDownSandwich = true;
+                
+                onHorizontalSandwich?.Invoke(coll.horizontalHitbox.x + right.distance + left.distance);
+                horizontalSandwichGap = coll.horizontalHitbox.x + right.distance + left.distance;
 
                 transform.position += Vector3.right * (right.distance - left.distance) / 2;
             }
             else if (rightCheck && !leftCheck)
             {
                 // X축 오른쪽 충돌
-                if (rightStuck && right.distance > 0 && velocity.x >= -almostZero)
+                if (isRightSandwich && right.distance > 0 && velocity.x >= -almostZero)
                 {
                     // 끼임
                     transform.position += Mathf.Min(vbRight.distance, 0) * Vector3.right;
@@ -279,13 +403,13 @@ namespace JaeminPark.PlatformerKit
                     // 벽면
                     transform.position += right.distance * Vector3.right;
                     velocity.x = 0;
-                    rightWall = true;
+                    isRightWall = true;
                 }
             }
             else if (leftCheck && !rightCheck)
             {
                 // X축 왼쪽 충돌
-                if (leftStuck && left.distance > 0 && velocity.x <= almostZero)
+                if (isLeftSandwich && left.distance > 0 && velocity.x <= almostZero)
                 {
                     // 끼임
                     transform.position += Mathf.Min(vbLeft.distance, 0) * Vector3.left;
@@ -308,7 +432,7 @@ namespace JaeminPark.PlatformerKit
                     // 벽면
                     transform.position += left.distance * Vector3.left;
                     velocity.x = 0;
-                    leftWall = true;
+                    isLeftWall = true;
                 }
             }
             else
@@ -320,7 +444,7 @@ namespace JaeminPark.PlatformerKit
             PlatformerHit descSlope = coll.RaycastDown(downLayer, coll.slopeCheckOffset);
             bool descSlopeHit = descSlope.hit && descSlope.distance <= coll.slopeCheckOffset && velocity.y == 0;
 
-            if (descSlopeHit && !(leftStuck && rightStuck))
+            if (descSlopeHit && !(isLeftSandwich && isRightSandwich))
             {
                 // 아래에 내려가는 경사면이 있어 붙어서 가야 할 때
                 transform.position += descSlope.distance * Vector3.down;
@@ -373,7 +497,7 @@ namespace JaeminPark.PlatformerKit
         {
             leftPlatform?.OnBodyStay(this, Direction.Left);
             rightPlatform?.OnBodyStay(this, Direction.Right);
-            steppingPlatform?.OnBodyStay(this, Direction.Down);
+            downPlatform?.OnBodyStay(this, Direction.Down);
             upPlatform?.OnBodyStay(this, Direction.Up);
         }
     }
