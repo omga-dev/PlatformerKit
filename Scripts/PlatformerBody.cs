@@ -27,11 +27,6 @@ namespace JaeminPark.PlatformerKit
         public LayerMask platformLayer;
 
         /// <summary>
-        /// Whether debug log is enabled.
-        /// </summary>
-        public bool debugEnabled;
-
-        /// <summary>
         /// Velocity less than this value is treated the same with 0.
         /// </summary>
         public const float almostZero = 0.01f;
@@ -395,38 +390,27 @@ namespace JaeminPark.PlatformerKit
 
                 transform.position += Vector3.right * (right.distance - left.distance) / 2;
             }
-            else if (rightSlopeCheck && (!rightCheck || right.distance >= 0))
-            {
-                // 오른쪽 경사로
-                float angle = Vector2.Angle(vbRight.normal, Vector2.up);
-                float xSpeed = Mathf.Abs(velocity.x);
-                float xSign = Mathf.Sign(velocity.x);
-
-                transform.position += new Vector3(
-                        Mathf.Cos(angle * Mathf.Deg2Rad) * xSpeed * xSign,
-                        Mathf.Sin(angle * Mathf.Deg2Rad) * xSpeed
-                    ) * Time.timeScale;
-            }
-            else if (leftSlopeCheck && (!leftCheck || left.distance >= 0))
-            {
-                // 왼쪽 경사로
-                float angle = Vector2.Angle(vbLeft.normal, Vector2.up);
-                float xSpeed = Mathf.Abs(velocity.x);
-                float xSign = Mathf.Sign(velocity.x);
-
-                transform.position += new Vector3(
-                        Mathf.Cos(angle * Mathf.Deg2Rad) * xSpeed * xSign,
-                        Mathf.Sin(angle * Mathf.Deg2Rad) * xSpeed
-                    ) * Time.timeScale;
-            }
             else if (rightCheck && !leftCheck)
             {
+                float angle = Vector2.Angle(vbRight.normal, Vector2.up);
+
                 // X축 오른쪽 충돌
                 if (isRightSandwich && right.distance > 0 && velocity.x >= -almostZero)
                 {
                     // 끼임
                     transform.position += Mathf.Min(vbRight.distance, 0) * Vector3.right;
                     velocity.x = 0;
+                }
+                else if (rightSlopeCheck && right.distance >= -almostZero && angle <= coll.maxHorizontalSlopeAngle)
+                {
+                    // 경사로
+                    float xSpeed = Mathf.Abs(velocity.x);
+                    float xSign = Mathf.Sign(velocity.x);
+
+                    transform.position += new Vector3(
+                            Mathf.Cos(angle * Mathf.Deg2Rad) * xSpeed * xSign,
+                            Mathf.Sin(angle * Mathf.Deg2Rad) * xSpeed
+                        ) * Time.timeScale;
                 }
                 else
                 {
@@ -438,6 +422,8 @@ namespace JaeminPark.PlatformerKit
             }
             else if (leftCheck && !rightCheck)
             {
+                float angle = Vector2.Angle(vbLeft.normal, Vector2.up);
+
                 // X축 왼쪽 충돌
                 if (isLeftSandwich && left.distance > 0 && velocity.x <= almostZero)
                 {
@@ -445,8 +431,20 @@ namespace JaeminPark.PlatformerKit
                     transform.position += Mathf.Min(vbLeft.distance, 0) * Vector3.left;
                     velocity.x = 0;
                 }
+                else if (leftSlopeCheck && left.distance >= -almostZero && angle <= coll.maxHorizontalSlopeAngle)
+                {
+                    // 경사로
+                    float xSpeed = Mathf.Abs(velocity.x);
+                    float xSign = Mathf.Sign(velocity.x);
+
+                    transform.position += new Vector3(
+                            Mathf.Cos(angle * Mathf.Deg2Rad) * xSpeed * xSign,
+                            Mathf.Sin(angle * Mathf.Deg2Rad) * xSpeed
+                        ) * Time.timeScale;
+                }
                 else
                 {
+                    // 벽면
                     transform.position += left.distance * Vector3.left;
                     isLeftWall = true;
                     UpdateXBumpVelocity(left, Direction.Left);
@@ -516,12 +514,6 @@ namespace JaeminPark.PlatformerKit
             rightPlatform?.OnBodyStay(this, Direction.Right);
             downPlatform?.OnBodyStay(this, Direction.Down);
             upPlatform?.OnBodyStay(this, Direction.Up);
-        }
-
-        private void ㅇ(string s)
-        {
-            if (debugEnabled)
-                Debug.Log(s);
         }
     }
 }
