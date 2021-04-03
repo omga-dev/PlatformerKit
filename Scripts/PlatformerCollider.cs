@@ -86,13 +86,13 @@ namespace JaeminPark.PlatformerKit
         private void UpdateVBPosition()
         {
             vbDownLeft = _verticalHitbox * new Vector2(-0.5f, -0.5f) - Vector2.down * 0.01f;
-            vbLeftDown = _verticalHitbox * new Vector2(-0.5f, -0.5f);
+            vbLeftDown = _verticalHitbox * new Vector2(-0.5f, -0.5f) - Vector2.left * 0.01f;
             vbDownRight = _verticalHitbox * new Vector2(0.5f, -0.5f) - Vector2.down * 0.01f;
-            vbRightDown = _verticalHitbox * new Vector2(0.5f, -0.5f);
+            vbRightDown = _verticalHitbox * new Vector2(0.5f, -0.5f) - Vector2.right * 0.01f;
             vbUpLeft = _verticalHitbox * new Vector2(-0.5f, 0.5f) - Vector2.up * 0.01f;
-            vbLeftUp = _verticalHitbox * new Vector2(-0.5f, 0.5f);
+            vbLeftUp = _verticalHitbox * new Vector2(-0.5f, 0.5f) - Vector2.left * 0.01f;
             vbUpRight = _verticalHitbox * new Vector2(0.5f, 0.5f) - Vector2.up * 0.01f;
-            vbRightUp = _verticalHitbox * new Vector2(0.5f, 0.5f);
+            vbRightUp = _verticalHitbox * new Vector2(0.5f, 0.5f) - Vector2.right * 0.01f;
         }
 
         private void UpdatePBPosition()
