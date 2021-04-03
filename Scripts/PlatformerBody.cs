@@ -395,7 +395,7 @@ namespace JaeminPark.PlatformerKit
 
                 transform.position += Vector3.right * (right.distance - left.distance) / 2;
             }
-            else if (rightSlopeCheck && (!rightCheck || right.distance > 0))
+            else if (rightSlopeCheck && (!rightCheck || right.distance >= 0))
             {
                 // 오른쪽 경사로
                 float angle = Vector2.Angle(vbRight.normal, Vector2.up);
@@ -407,7 +407,7 @@ namespace JaeminPark.PlatformerKit
                         Mathf.Sin(angle * Mathf.Deg2Rad) * xSpeed
                     ) * Time.timeScale;
             }
-            else if (leftSlopeCheck && (!leftCheck || left.distance > 0))
+            else if (leftSlopeCheck && (!leftCheck || left.distance >= 0))
             {
                 // 왼쪽 경사로
                 float angle = Vector2.Angle(vbLeft.normal, Vector2.up);
