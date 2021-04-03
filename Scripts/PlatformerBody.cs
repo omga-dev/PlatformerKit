@@ -392,6 +392,8 @@ namespace JaeminPark.PlatformerKit
             }
             else if (rightCheck && !leftCheck)
             {
+                float angle = Vector2.Angle(vbRight.normal, Vector2.up);
+
                 // X축 오른쪽 충돌
                 if (isRightSandwich && right.distance > 0 && velocity.x >= -almostZero)
                 {
@@ -399,10 +401,9 @@ namespace JaeminPark.PlatformerKit
                     transform.position += Mathf.Min(vbRight.distance, 0) * Vector3.right;
                     velocity.x = 0;
                 }
-                else if (rightSlopeCheck && right.distance >= -almostZero)
+                else if (rightSlopeCheck && right.distance >= -almostZero && angle <= coll.maxHorizontalSlopeAngle)
                 {
                     // 경사로
-                    float angle = Vector2.Angle(vbRight.normal, Vector2.up);
                     float xSpeed = Mathf.Abs(velocity.x);
                     float xSign = Mathf.Sign(velocity.x);
 
@@ -421,6 +422,8 @@ namespace JaeminPark.PlatformerKit
             }
             else if (leftCheck && !rightCheck)
             {
+                float angle = Vector2.Angle(vbLeft.normal, Vector2.up);
+
                 // X축 왼쪽 충돌
                 if (isLeftSandwich && left.distance > 0 && velocity.x <= almostZero)
                 {
@@ -428,10 +431,9 @@ namespace JaeminPark.PlatformerKit
                     transform.position += Mathf.Min(vbLeft.distance, 0) * Vector3.left;
                     velocity.x = 0;
                 }
-                else if (leftSlopeCheck && left.distance >= -almostZero)
+                else if (leftSlopeCheck && left.distance >= -almostZero && angle <= coll.maxHorizontalSlopeAngle)
                 {
                     // 경사로
-                    float angle = Vector2.Angle(vbLeft.normal, Vector2.up);
                     float xSpeed = Mathf.Abs(velocity.x);
                     float xSign = Mathf.Sign(velocity.x);
 

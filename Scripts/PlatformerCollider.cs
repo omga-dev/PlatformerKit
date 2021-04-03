@@ -52,6 +52,9 @@ namespace JaeminPark.PlatformerKit
         /// Hitbox on checking Y axis.
         /// </summary>
         public float slopeCheckOffset { get { return _slopeCheckOffset; } set { _slopeCheckOffset = value; } }
+        
+        internal float maxHorizontalSlopeAngle { get { return Vector2.Angle(horizontalHitbox - verticalHitbox, Vector2.right); } }
+        internal float maxVerticalSlopeAngle { get { return Vector2.Angle(verticalHitbox - horizontalHitbox, Vector2.up); } }
 
         private Vector2 hbDownLeft, hbLeftDown, hbDownRight, hbRightDown, hbUpLeft, hbLeftUp, hbUpRight, hbRightUp,
             vbDownLeft, vbLeftDown, vbDownRight, vbRightDown, vbUpLeft, vbLeftUp, vbUpRight, vbRightUp,
