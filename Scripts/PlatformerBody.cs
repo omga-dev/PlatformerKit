@@ -459,7 +459,7 @@ namespace JaeminPark.PlatformerKit
             PlatformerHit descSlope = coll.RaycastDown(downLayer, coll.slopeCheckOffset);
             bool descSlopeHit = descSlope.hit && descSlope.distance <= coll.slopeCheckOffset && velocity.y == 0;
 
-            if (descSlopeHit && !(isLeftSandwich && isRightSandwich) && velocity.y == 0)
+            if (descSlopeHit && !(isLeftSandwich && isRightSandwich))
             {
                 // 아래에 내려가는 경사면이 있어 붙어서 가야 할 때
                 transform.position += descSlope.distance * Vector3.down;
