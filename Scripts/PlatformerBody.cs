@@ -240,7 +240,7 @@ namespace JaeminPark.PlatformerKit
 
                 velocity.y = 0;
             }
-            else if (upSlopeCheck && !upCheck)
+            /*else if (upSlopeCheck && !upCheck)
             {
                 // Y축 위 경사로
                 float angle = Vector2.Angle(hbUp.normal, Vector2.up);
@@ -263,7 +263,7 @@ namespace JaeminPark.PlatformerKit
                         Mathf.Cos(angle * Mathf.Deg2Rad) * ySpeed * Mathf.Sign(hbDown.normal.x),
                         Mathf.Sin(angle * Mathf.Deg2Rad) * ySpeed * ySign
                     ) * Time.timeScale;
-            }
+            }*/
             else if (upCheck && !downCheck)
             {
                 // Y축 위 충돌
