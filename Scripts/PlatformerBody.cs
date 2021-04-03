@@ -230,7 +230,6 @@ namespace JaeminPark.PlatformerKit
             if (up.hit && up.distance <= stickThreshold && down.hit && down.distance <= stickThreshold)
             {
                 // 오른쪽, 왼쪽 끼임
-                Log("오른쪽-왼쪽 끼임");
                 float stuckNormal = (up.normal.normalized + down.normal.normalized).normalized.x;
                 if (stuckNormal < 0)
                     isRightSandwich = true;
@@ -246,7 +245,7 @@ namespace JaeminPark.PlatformerKit
 
                 velocity.y = 0;
             }
-            /*else if (upSlopeCheck && !upCheck)
+            else if (upSlopeCheck && !upCheck)
             {
                 // Y축 위 경사로
                 float angle = Vector2.Angle(hbUp.normal, Vector2.up);
@@ -269,10 +268,9 @@ namespace JaeminPark.PlatformerKit
                         Mathf.Cos(angle * Mathf.Deg2Rad) * ySpeed * Mathf.Sign(hbDown.normal.x),
                         Mathf.Sin(angle * Mathf.Deg2Rad) * ySpeed * ySign
                     ) * Time.timeScale;
-            }*/
+            }
             else if (upCheck && !downCheck)
             {
-                Log("Y축 위");
                 // Y축 위 충돌
                 if (isUpSandwich && !isDownSandwich)
                 {
@@ -288,7 +286,6 @@ namespace JaeminPark.PlatformerKit
             }
             else if (downCheck && !upCheck)
             {
-                Log("Y축 아래");
                 // Y축 아래 충돌
                 if (isDownSandwich && !isUpSandwich)
                 {
@@ -384,7 +381,6 @@ namespace JaeminPark.PlatformerKit
 
             if (right.hit && right.distance <= 0 && left.hit && left.distance <= 0)
             {
-                Log("위-아래 끼임");
                 // 위, 아래 끼임
                 float stuckNormal = (left.normal.normalized + right.normal.normalized).normalized.y;
                 if (stuckNormal < 0)
@@ -399,6 +395,30 @@ namespace JaeminPark.PlatformerKit
 
                 transform.position += Vector3.right * (right.distance - left.distance) / 2;
             }
+            else if (rightSlopeCheck && !rightCheck)
+            {
+                // 오른쪽 경사로
+                float angle = Vector2.Angle(vbRight.normal, Vector2.up);
+                float xSpeed = Mathf.Abs(velocity.x);
+                float xSign = Mathf.Sign(velocity.x);
+
+                transform.position += new Vector3(
+                        Mathf.Cos(angle * Mathf.Deg2Rad) * xSpeed * xSign,
+                        Mathf.Sin(angle * Mathf.Deg2Rad) * xSpeed
+                    ) * Time.timeScale;
+            }
+            else if (leftSlopeCheck && !leftCheck)
+            {
+                // 왼쪽 경사로
+                float angle = Vector2.Angle(vbLeft.normal, Vector2.up);
+                float xSpeed = Mathf.Abs(velocity.x);
+                float xSign = Mathf.Sign(velocity.x);
+
+                transform.position += new Vector3(
+                        Mathf.Cos(angle * Mathf.Deg2Rad) * xSpeed * xSign,
+                        Mathf.Sin(angle * Mathf.Deg2Rad) * xSpeed
+                    ) * Time.timeScale;
+            }
             else if (rightCheck && !leftCheck)
             {
                 // X축 오른쪽 충돌
@@ -408,22 +428,8 @@ namespace JaeminPark.PlatformerKit
                     transform.position += Mathf.Min(vbRight.distance, 0) * Vector3.right;
                     velocity.x = 0;
                 }
-                else if (rightSlopeCheck && right.distance >= -almostZero)
-                {
-                    Log("오른쪽 경사로");
-                    // 경사로
-                    float angle = Vector2.Angle(vbRight.normal, Vector2.up);
-                    float xSpeed = Mathf.Abs(velocity.x);
-                    float xSign = Mathf.Sign(velocity.x);
-
-                    transform.position += new Vector3(
-                            Mathf.Cos(angle * Mathf.Deg2Rad) * xSpeed * xSign,
-                            Mathf.Sin(angle * Mathf.Deg2Rad) * xSpeed
-                        ) * Time.timeScale;
-                }
                 else
                 {
-                    Log("오른쪽 벽");
                     // 벽면
                     transform.position += right.distance * Vector3.right;
                     isRightWall = true;
@@ -439,23 +445,8 @@ namespace JaeminPark.PlatformerKit
                     transform.position += Mathf.Min(vbLeft.distance, 0) * Vector3.left;
                     velocity.x = 0;
                 }
-                else if (leftSlopeCheck && left.distance >= -almostZero)
-                {
-                    Log("왼쪽 경사로");
-                    // 경사로
-                    float angle = Vector2.Angle(vbLeft.normal, Vector2.up);
-                    float xSpeed = Mathf.Abs(velocity.x);
-                    float xSign = Mathf.Sign(velocity.x);
-
-                    transform.position += new Vector3(
-                            Mathf.Cos(angle * Mathf.Deg2Rad) * xSpeed * xSign,
-                            Mathf.Sin(angle * Mathf.Deg2Rad) * xSpeed
-                        ) * Time.timeScale;
-                }
                 else
                 {
-                    Log("왼쪽 벽");
-                    // 벽면
                     transform.position += left.distance * Vector3.left;
                     isLeftWall = true;
                     UpdateXBumpVelocity(left, Direction.Left);
@@ -527,7 +518,7 @@ namespace JaeminPark.PlatformerKit
             upPlatform?.OnBodyStay(this, Direction.Up);
         }
 
-        private void Log(string s)
+        private void ㅇ(string s)
         {
             if (debugEnabled)
                 Debug.Log(s);
