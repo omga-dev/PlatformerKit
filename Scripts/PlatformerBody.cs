@@ -167,7 +167,10 @@ namespace JaeminPark.PlatformerKit
         private void Awake()
         {
             coll = GetComponent<PlatformerCollider>();
+            OnAwake();
         }
+
+        protected virtual void OnAwake() { }
 
         private void FixedUpdate()
         {
