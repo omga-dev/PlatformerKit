@@ -187,7 +187,7 @@ namespace JaeminPark.PlatformerKit
 
         protected virtual void UpdateVelocity()
         {
-            velocity += gravity;
+            velocity += gravity * Time.timeScale;
         }
 
         protected virtual void UpdateXBumpVelocity(PlatformerHit hit, Direction direction)
