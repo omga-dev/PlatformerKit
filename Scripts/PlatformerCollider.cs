@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace JaeminPark.PlatformerKit
 {
-    internal struct PlatformerHit
+    public struct PlatformerHit
     {
         public bool hit { get; private set; }
         public float distance { get; private set; }
