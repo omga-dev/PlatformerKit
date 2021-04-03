@@ -187,6 +187,16 @@ namespace JaeminPark.PlatformerKit
             velocity += gravity;
         }
 
+        protected virtual void UpdateXBumpVelocity(PlatformerHit hit, Direction direction)
+        {
+            velocity.x = 0;
+        }
+
+        protected virtual void UpdateYBumpVelocity(PlatformerHit hit, Direction direction)
+        {
+            velocity.y = 0;
+        }
+
         protected void UpdateYAxis()
         {
             PlatformerHit pbDown = coll.RaycastPbDown(platformLayer, -velocity.y);
@@ -263,7 +273,7 @@ namespace JaeminPark.PlatformerKit
                 {
                     transform.position += up.distance * Vector3.up;
                     isUpWall = true;
-                    velocity.y = 0;
+                    UpdateYBumpVelocity(up, Direction.Up);
                 }
             }
             else if (downCheck && !upCheck)
@@ -282,7 +292,7 @@ namespace JaeminPark.PlatformerKit
                     PlatformerHit right = coll.RaycastRight(solidLayer, velocity.x);
                     if ((!right.hit || right.distance >= -almostZero) && (!left.hit || left.distance >= -almostZero))
                     {
-                        velocity.y = 0;
+                        UpdateYBumpVelocity(down, Direction.Down);
                         isDownWall = true;
                     }
                 }
@@ -402,8 +412,8 @@ namespace JaeminPark.PlatformerKit
                 {
                     // 벽면
                     transform.position += right.distance * Vector3.right;
-                    velocity.x = 0;
                     isRightWall = true;
+                    UpdateXBumpVelocity(right, Direction.Right);
                 }
             }
             else if (leftCheck && !rightCheck)
@@ -431,8 +441,8 @@ namespace JaeminPark.PlatformerKit
                 {
                     // 벽면
                     transform.position += left.distance * Vector3.left;
-                    velocity.x = 0;
                     isLeftWall = true;
+                    UpdateXBumpVelocity(left, Direction.Left);
                 }
             }
             else
