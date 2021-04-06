@@ -10,6 +10,11 @@ namespace JaeminPark.PlatformerKit
         /// </summary>
         [HideInInspector]
         public Vector2 velocity;
+        
+        /// <summary>
+        /// Linear velocity at last frame.
+        /// </summary>
+        public Vector2 velocityAtLastFrame { get; private set; }
 
         /// <summary>
         /// Gravity applied to the body every frame.
@@ -39,168 +44,223 @@ namespace JaeminPark.PlatformerKit
         /// Whether this body is detecting a collision on its left side.
         /// </summary>
         public bool isLeftWall { get; private set; }
+        private bool wasLeftWall;
+        public bool isLeftWallEntering { get { return !wasLeftWall && isLeftWall; } }
+        public bool isLeftWallExitting { get { return wasLeftWall && !isLeftWall; } }
 
         /// <summary>
         /// Whether this body is detecting a collision on its right side.
         /// </summary>
         public bool isRightWall { get; private set; }
+        private bool wasRightWall;
+        public bool isRightWallEntering { get { return !isRightWall && wasRightWall; } }
+        public bool isRightWallExitting { get { return isRightWall && !wasRightWall; } }
 
         /// <summary>
         /// Whether this body is detecting a collision on its bottom side.
         /// </summary>
         public bool isDownWall { get; private set; }
+        private bool wasDownWall;
+        public bool isDownWallEntering { get { return !isDownWall && wasDownWall; } }
+        public bool isDownWallExitting { get { return isDownWall && !wasDownWall; } }
 
         /// <summary>
         /// Whether this body is detecting a collision on its upper side.
         /// </summary>
         public bool isUpWall { get; private set; }
+        private bool wasUpWall;
+        public bool isUpWallEntering { get { return !isUpWall && wasUpWall; } }
+        public bool isUpWallExitting { get { return isUpWall && !wasUpWall; } }
 
         /// <summary>
         /// Whether this body is detecting a sandwiching on its left side.
         /// </summary>
         public bool isLeftSandwich { get; private set; }
+        private bool wasLeftSandwich;
+        public bool isLeftSandwichStarting { get { return !isLeftSandwich && wasLeftSandwich; } }
+        public bool isLeftSandwichFinishing { get { return isLeftSandwich && !wasLeftSandwich; } }
 
         /// <summary>
         /// Whether this body is detecting a sandwiching on its right side.
         /// </summary>
         public bool isRightSandwich { get; private set; }
+        private bool wasRightSandwich;
+        public bool isRightSandwichStarting { get { return !isRightSandwich && wasRightSandwich; } }
+        public bool isRightSandwichFinishing { get { return isRightSandwich && !wasRightSandwich; } }
 
         /// <summary>
         /// A gap between two colliders horizontally sandwiching the body. (Mathf.Infinity when body's not detecting a sandwich.)
         /// </summary>
         public float horizontalSandwichGap { get; private set; }
+        public float horizontalSandwichGapLastFrame { get; private set; }
 
         /// <summary>
         /// Whether this body is detecting a sandwiching on its bottom side.
         /// </summary>
         public bool isDownSandwich { get; private set; }
+        private bool wasDownSandwich;
+        public bool isDownSandwichStarting { get { return !isDownSandwich && wasDownSandwich; } }
+        public bool isDownSandwichFinishing { get { return isDownSandwich && !wasDownSandwich; } }
 
         /// <summary>
         /// Whether this body is detecting a sandwiching on its upper side.
         /// </summary>
         public bool isUpSandwich { get; private set; }
+        private bool wasUpSandwich;
+        public bool isUpSandwichStarting { get { return !isUpSandwich && wasUpSandwich; } }
+        public bool isUpSandwichFinishing { get { return isUpSandwich && !wasUpSandwich; } }
 
         /// <summary>
         /// A gap between two colliders vertically sandwiching the body. (Mathf.Infinity when body's not detecting a sandwich.)
         /// </summary>
         public float verticalSandwichGap { get; private set; }
+        public float verticalSandwichGapLastFrame { get; private set; }
 
         /// <summary>
         /// Whether this body is standing on a ground.
         /// </summary>
         public bool isGround { get { return isDownWall || isDownSandwich; } }
+        private bool wasGround;
+        public bool isGroundEntering { get { return !isGround && wasGround; } }
+        public bool isGroundExitting { get { return isGround && !wasGround; } }
 
         /// <summary>
         /// GameObject being detected on its left side.
         /// </summary>
         public GameObject leftObject { get; private set; }
+        public GameObject leftObjectLastFrame { get; private set; }
 
         /// <summary>
         /// PlatformBase being detected on its left side.
         /// </summary>
         public PlatformBase leftPlatform { get; private set; }
+        public PlatformBase leftPlatformLastFrame { get; private set; }
 
         /// <summary>
         /// GameObject being detected on its right side.
         /// </summary>
         public GameObject rightObject { get; private set; }
+        public GameObject rightObjectLastFrame { get; private set; }
 
         /// <summary>
         /// PlatformBase being detected on its right side.
         /// </summary>
         public PlatformBase rightPlatform { get; private set; }
+        public PlatformBase rightPlatformLastFrame { get; private set; }
 
         /// <summary>
         /// GameObject being detected on its bottom side.
         /// </summary>
         public GameObject downObject { get; private set; }
+        public GameObject downObjectLastFrame { get; private set; }
 
         /// <summary>
         /// PlatformBase being detected on its bottom side.
         /// </summary>
         public PlatformBase downPlatform { get; private set; }
+        public PlatformBase downPlatformLastFrame { get; private set; }
 
         /// <summary>
         /// GameObject being detected on its upper side.
         /// </summary>
         public GameObject upObject { get; private set; }
+        public GameObject upObjectLastFrame { get; private set; }
 
         /// <summary>
         /// PlatformBase being detected on its upper side.
         /// </summary>
         public PlatformBase upPlatform { get; private set; }
-        
+        public PlatformBase upPlatformLastFrame { get; private set; }
+
         /// <summary>
         /// Delegate of the event called when the body's being sandwiched.
         /// </summary>
         /// <param name="gap">Gap between two sandwiching collider.</param>
+        [System.Obsolete]
         public delegate void SandwichEvent(float gap);
 
         /// <summary>
         /// Event called when the body's being sandwiched vertically.
         /// </summary>
+        [System.Obsolete]
         public event SandwichEvent onVerticalSandwich;
 
         /// <summary>
         /// Event called when the body's being sandwiched horizontally.
         /// </summary>
+        [System.Obsolete]
         public event SandwichEvent onHorizontalSandwich;
-        
+
         /// <summary>
         /// Delegate of the event called when the body has entered or exited from a platform collision.
         /// </summary>
         /// <param name="platformObject">detected GameObject.</param>
         /// <param name="platform">detected PlatformBase.</param>
         /// <param name="direction">Direction of collision. (e.g. Direction.Down when body's stepping on it.)</param>
+        [System.Obsolete]
         public delegate void PlatformEvent(GameObject platformObject, PlatformBase platform, Direction direction);
 
         /// <summary>
         /// Event called when the body has entered a platform collision.
         /// </summary>
+        [System.Obsolete]
         public event PlatformEvent onPlatformEnter;
 
         /// <summary>
         /// Event called when the body has exited from a platform collision.
         /// </summary>
+        [System.Obsolete]
         public event PlatformEvent onPlatformExit;
 
         private void Awake()
         {
             coll = GetComponent<PlatformerCollider>();
-            OnAwake();
         }
-
-        protected virtual void OnAwake() { }
 
         private void FixedUpdate()
         {
             UpdatePhysics();
         }
 
-        protected virtual void UpdatePhysics()
+        private void UpdatePhysics()
         {
+            UpdateFrame();
             UpdateVelocity();
             UpdateYAxis();
             UpdateXAxis();
             UpdatePlatform();
         }
 
-        protected virtual void UpdateVelocity()
+        private void UpdateFrame()
+        {
+            velocityAtLastFrame = velocity;
+            wasLeftWall = isLeftWall;
+            wasRightWall = isRightWall;
+            wasDownWall = isDownWall;
+            wasUpWall = isUpWall;
+            wasLeftSandwich = isLeftSandwich;
+            wasRightSandwich = isRightSandwich;
+            verticalSandwichGapLastFrame = verticalSandwichGap;
+            wasDownSandwich = isDownSandwich;
+            wasUpSandwich = isUpSandwich;
+            horizontalSandwichGapLastFrame = horizontalSandwichGap;
+            wasGround = isGround;
+            leftObjectLastFrame = leftObject;
+            rightObjectLastFrame = rightObject;
+            downObjectLastFrame = downObject;
+            upObjectLastFrame = upObject;
+            leftPlatformLastFrame = leftPlatform;
+            rightPlatformLastFrame = rightPlatform;
+            downPlatformLastFrame = downPlatform;
+            upPlatformLastFrame = upPlatform;
+        }
+
+        private void UpdateVelocity()
         {
             velocity += gravity * Time.timeScale;
         }
 
-        protected virtual void UpdateXBumpVelocity(PlatformerHit hit, Direction direction)
-        {
-            velocity.x = 0;
-        }
-
-        protected virtual void UpdateYBumpVelocity(PlatformerHit hit, Direction direction)
-        {
-            velocity.y = 0;
-        }
-
-        protected void UpdateYAxis()
+        private void UpdateYAxis()
         {
             PlatformerHit pbDown = coll.RaycastPbDown(platformLayer, -velocity.y);
             LayerMask downLayer = (pbDown.hit && pbDown.distance < almostZero) ? solidLayer : (LayerMask)(solidLayer + platformLayer);
@@ -276,7 +336,7 @@ namespace JaeminPark.PlatformerKit
                 {
                     transform.position += up.distance * Vector3.up;
                     isUpWall = true;
-                    UpdateYBumpVelocity(up, Direction.Up);
+                    velocity.y = 0;
                 }
             }
             else if (downCheck && !upCheck)
@@ -295,7 +355,7 @@ namespace JaeminPark.PlatformerKit
                     PlatformerHit right = coll.RaycastRight(solidLayer, velocity.x);
                     if ((!right.hit || right.distance >= -almostZero) && (!left.hit || left.distance >= -almostZero))
                     {
-                        UpdateYBumpVelocity(down, Direction.Down);
+                        velocity.y = 0;
                         isDownWall = true;
                     }
                 }
@@ -348,7 +408,7 @@ namespace JaeminPark.PlatformerKit
             }
         }
 
-        protected void UpdateXAxis()
+        private void UpdateXAxis()
         {
             float upCheckDist = Mathf.Max(velocity.y, almostZero);
             float downCheckDist = Mathf.Max(-velocity.y, almostZero);
@@ -417,7 +477,7 @@ namespace JaeminPark.PlatformerKit
                     // 벽면
                     transform.position += right.distance * Vector3.right;
                     isRightWall = true;
-                    UpdateXBumpVelocity(right, Direction.Right);
+                    velocity.x = 0;
                 }
             }
             else if (leftCheck && !rightCheck)
@@ -447,7 +507,7 @@ namespace JaeminPark.PlatformerKit
                     // 벽면
                     transform.position += left.distance * Vector3.left;
                     isLeftWall = true;
-                    UpdateXBumpVelocity(left, Direction.Left);
+                    velocity.x = 0;
                 }
             }
             else
