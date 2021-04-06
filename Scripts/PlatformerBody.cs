@@ -522,8 +522,7 @@ namespace JaeminPark.PlatformerKit
                 if (slope.hit && velocity.x != 0 && velocity.y == 0 && !(isLeftSandwich && isRightSandwich))
                 {
                     float angle = Vector2.Angle(slope.normal, Vector2.up);
-
-                    Debug.Log(isSlopeOpposite + " " + (angle <= coll.maxHorizontalSlopeAngle));
+                    
                     if (isSlopeOpposite && angle <= coll.maxHorizontalSlopeAngle)
                     {
                         // 아래에 내려가는 경사면이 있어 붙어서 가야 할 때
