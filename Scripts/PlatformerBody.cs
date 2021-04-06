@@ -279,7 +279,7 @@ namespace JaeminPark.PlatformerKit
             isUpWall = false;
             isRightSandwich = false;
             isLeftSandwich = false;
-            verticalSandwichGap = 0;
+            verticalSandwichGap = Mathf.Infinity;
 
             float stickThreshold = Mathf.Sin(Vector2.Angle(Vector2.up, down.normal) * Mathf.Deg2Rad) * Mathf.Abs(velocity.x);
             if (up.hit && up.distance <= stickThreshold && down.hit && down.distance <= stickThreshold)
@@ -432,7 +432,7 @@ namespace JaeminPark.PlatformerKit
             isRightWall = false;
             isUpSandwich = false;
             isDownSandwich = false;
-            horizontalSandwichGap = 0;
+            horizontalSandwichGap = Mathf.Infinity;
 
             if (right.hit && right.distance <= 0 && left.hit && left.distance <= 0)
             {
