@@ -1,6 +1,6 @@
 {
 	"name": "com.jaeminpark.platformerkit",
-	"version": "1.2.0",
+	"version": "1.2.1",
 	"displayName": "Platformer Kit",
 	"description": "The Platformer Kit is a simple implementation of platformer physics, coming with a sandbox aiming to increase productivity developing indie platformers. The kit supports various parameters / events so that developers can easily adopt their ideas into a code.",
 	"unity": "2019.4",
