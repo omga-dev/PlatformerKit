@@ -30,8 +30,6 @@ namespace JaeminPark.PlatformerKit
         private Vector2 _verticalHitbox = new Vector2(0.75f, 1f);
         [SerializeField]
         private float _platformCheckOffset = 0.05f;
-        [SerializeField]
-        private float _slopeCheckOffset = 0.05f;
 
         /// <summary>
         /// Hitbox on checking Y axis.
@@ -47,14 +45,10 @@ namespace JaeminPark.PlatformerKit
         /// Hitbox on checking Y axis.
         /// </summary>
         public float platformCheckOffset { get { return _platformCheckOffset; } set { _platformCheckOffset = value; UpdatePBPosition(); } }
-
-        /// <summary>
-        /// Hitbox on checking Y axis.
-        /// </summary>
-        public float slopeCheckOffset { get { return _slopeCheckOffset; } set { _slopeCheckOffset = value; } }
         
         internal float maxHorizontalSlopeAngle { get { return Vector2.Angle(horizontalHitbox - verticalHitbox, Vector2.right); } }
         internal float maxVerticalSlopeAngle { get { return Vector2.Angle(verticalHitbox - horizontalHitbox, Vector2.up); } }
+        internal float slopeCheckRate { get { return (verticalHitbox.y - horizontalHitbox.y) / (horizontalHitbox.x - verticalHitbox.x); } }
 
         private Vector2 hbDownLeft, hbLeftDown, hbDownRight, hbRightDown, hbUpLeft, hbLeftUp, hbUpRight, hbRightUp,
             vbDownLeft, vbLeftDown, vbDownRight, vbRightDown, vbUpLeft, vbLeftUp, vbUpRight, vbRightUp,
@@ -207,7 +201,6 @@ namespace JaeminPark.PlatformerKit
                 Debug.DrawLine(position + _verticalHitbox * box[i], position + _verticalHitbox * box[(i + 1) % 4], new Color(0.694f, 0.992f, 0.349f));
 
             Debug.DrawLine(position + _verticalHitbox * box[0] - Vector2.down * _platformCheckOffset, position + _verticalHitbox * box[1] - Vector2.down * _platformCheckOffset, new Color(0.694f, 0.992f, 0.349f));
-            Debug.DrawLine(position + _verticalHitbox * box[0] + Vector2.down * slopeCheckOffset, position + _verticalHitbox * box[1] + Vector2.down * slopeCheckOffset, new Color(0.694f, 0.992f, 0.349f));
         }
 #endif
     }

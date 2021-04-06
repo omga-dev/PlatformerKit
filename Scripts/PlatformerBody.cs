@@ -512,18 +512,28 @@ namespace JaeminPark.PlatformerKit
             }
             else
             {
-                // X축 충돌하지 않음
                 transform.position += Vector3.right * velocity.x * Time.timeScale;
-            }
 
-            PlatformerHit descSlope = coll.RaycastDown(downLayer, coll.slopeCheckOffset);
-            bool descSlopeHit = descSlope.hit && descSlope.distance <= coll.slopeCheckOffset && velocity.y == 0;
+                float xSpeed = Mathf.Abs(velocity.x);
+                float xSign = Mathf.Sign(velocity.x);
+                float slopeCheckOffset = coll.slopeCheckRate * xSpeed + almostZero;
+                PlatformerHit slope = coll.RaycastDown(downLayer, slopeCheckOffset);
+                bool isSlopeOpposite = velocity.x < -almostZero && slope.normal.x < 0 || velocity.x > almostZero && slope.normal.x > 0;
+                if (slope.hit && velocity.x != 0 && velocity.y == 0 && !(isLeftSandwich && isRightSandwich))
+                {
+                    float angle = Vector2.Angle(slope.normal, Vector2.up);
 
-            if (descSlopeHit && !(isLeftSandwich && isRightSandwich))
-            {
-                // 아래에 내려가는 경사면이 있어 붙어서 가야 할 때
-                transform.position += descSlope.distance * Vector3.down;
-                velocity.y = 0;
+                    Debug.Log(isSlopeOpposite + " " + (angle <= coll.maxHorizontalSlopeAngle));
+                    if (isSlopeOpposite && angle <= coll.maxHorizontalSlopeAngle)
+                    {
+                        // 아래에 내려가는 경사면이 있어 붙어서 가야 할 때
+                        transform.position -= Vector3.right * velocity.x * Time.timeScale;
+                        transform.position += new Vector3(
+                                Mathf.Cos(angle * Mathf.Deg2Rad) * xSpeed * Mathf.Sign(slope.normal.x),
+                                Mathf.Sin(angle * Mathf.Deg2Rad) * -xSpeed
+                            ) * Time.timeScale;
+                    }
+                }
             }
 
             // 플랫폼 처리
