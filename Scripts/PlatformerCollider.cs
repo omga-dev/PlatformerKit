@@ -46,12 +46,10 @@ namespace JaeminPark.PlatformerKit
         /// </summary>
         public float platformCheckOffset { get { return _platformCheckOffset; } set { _platformCheckOffset = value; UpdatePBPosition(); } }
         
-        internal float maxHorizontalSlopeAngle { get { return Vector2.Angle(horizontalHitbox - verticalHitbox, Vector2.right); } }
-        internal float maxVerticalSlopeAngle { get { return Vector2.Angle(verticalHitbox - horizontalHitbox, Vector2.up); } }
-        internal float slopeCheckRate { get { return (verticalHitbox.y - horizontalHitbox.y) / (horizontalHitbox.x - verticalHitbox.x); } }
+        public float slopeCheckRate { get { return (verticalHitbox.y - horizontalHitbox.y) / (horizontalHitbox.x - verticalHitbox.x); } }
 
-        private Vector2 hbDownLeft, hbLeftDown, hbDownRight, hbRightDown, hbUpLeft, hbLeftUp, hbUpRight, hbRightUp,
-            vbDownLeft, vbLeftDown, vbDownRight, vbRightDown, vbUpLeft, vbLeftUp, vbUpRight, vbRightUp,
+        private Vector2 hbLeftDown, hbRightDown, hbLeftUp, hbRightUp,
+            vbLeftDown, vbRightDown, vbLeftUp, vbRightUp,
             pbLeftDown, pbRightDown;
         
         private Transform tf;
@@ -70,26 +68,18 @@ namespace JaeminPark.PlatformerKit
 
         private void UpdateHBPosition()
         {
-            hbDownLeft = _horizontalHitbox * new Vector2(-0.5f, -0.5f) - Vector2.down * 0.01f;
-            hbLeftDown = _horizontalHitbox * new Vector2(-0.5f, -0.5f) - Vector2.left * 0.01f;
-            hbDownRight = _horizontalHitbox * new Vector2(0.5f, -0.5f) - Vector2.down * 0.01f;
-            hbRightDown = _horizontalHitbox * new Vector2(0.5f, -0.5f) - Vector2.right * 0.01f;
-            hbUpLeft = _horizontalHitbox * new Vector2(-0.5f, 0.5f) - Vector2.up * 0.01f;
-            hbLeftUp = _horizontalHitbox * new Vector2(-0.5f, 0.5f) - Vector2.left * 0.01f;
-            hbUpRight = _horizontalHitbox * new Vector2(0.5f, 0.5f) - Vector2.up * 0.01f;
-            hbRightUp = _horizontalHitbox * new Vector2(0.5f, 0.5f) - Vector2.right * 0.01f;
+            hbLeftDown = _horizontalHitbox * new Vector2(-0.5f, -0.5f);
+            hbRightDown = _horizontalHitbox * new Vector2(0.5f, -0.5f);
+            hbLeftUp = _horizontalHitbox * new Vector2(-0.5f, 0.5f);
+            hbRightUp = _horizontalHitbox * new Vector2(0.5f, 0.5f);
         }
 
         private void UpdateVBPosition()
         {
-            vbDownLeft = _verticalHitbox * new Vector2(-0.5f, -0.5f) - Vector2.down * 0.01f;
-            vbLeftDown = _verticalHitbox * new Vector2(-0.5f, -0.5f) - Vector2.left * 0.01f;
-            vbDownRight = _verticalHitbox * new Vector2(0.5f, -0.5f) - Vector2.down * 0.01f;
-            vbRightDown = _verticalHitbox * new Vector2(0.5f, -0.5f) - Vector2.right * 0.01f;
-            vbUpLeft = _verticalHitbox * new Vector2(-0.5f, 0.5f) - Vector2.up * 0.01f;
-            vbLeftUp = _verticalHitbox * new Vector2(-0.5f, 0.5f) - Vector2.left * 0.01f;
-            vbUpRight = _verticalHitbox * new Vector2(0.5f, 0.5f) - Vector2.up * 0.01f;
-            vbRightUp = _verticalHitbox * new Vector2(0.5f, 0.5f) - Vector2.right * 0.01f;
+            vbLeftDown = _verticalHitbox * new Vector2(-0.5f, -0.5f);
+            vbRightDown = _verticalHitbox * new Vector2(0.5f, -0.5f);
+            vbLeftUp = _verticalHitbox * new Vector2(-0.5f, 0.5f);
+            vbRightUp = _verticalHitbox * new Vector2(0.5f, 0.5f);
         }
 
         private void UpdatePBPosition()
@@ -101,25 +91,25 @@ namespace JaeminPark.PlatformerKit
         internal PlatformerHit RaycastLeft(LayerMask layer, float distance)
         {
             Vector2 pos = tf.position;
-            return Raycast(pos + hbDownLeft, pos + hbUpLeft, _horizontalHitbox.x / 2, distance, Vector2.left, layer);
+            return Raycast(pos + hbLeftDown, pos + hbLeftUp, _horizontalHitbox.x / 2, distance, Vector2.left, layer);
         }
 
         internal PlatformerHit RaycastRight(LayerMask layer, float distance)
         {
             Vector2 pos = tf.position;
-            return Raycast(pos + hbDownRight, pos + hbUpRight, _horizontalHitbox.x / 2, distance, Vector2.right, layer);
+            return Raycast(pos + hbRightDown, pos + hbRightUp, _horizontalHitbox.x / 2, distance, Vector2.right, layer);
         }
 
         internal PlatformerHit RaycastVbLeft(LayerMask layer, float distance)
         {
             Vector2 pos = tf.position;
-            return Raycast(pos + vbDownLeft, pos + vbUpLeft, _verticalHitbox.x, distance, Vector2.left, layer);
+            return Raycast(pos + vbLeftDown, pos + vbLeftUp, _verticalHitbox.x, distance, Vector2.left, layer);
         }
 
         internal PlatformerHit RaycastVbRight(LayerMask layer, float distance)
         {
             Vector2 pos = tf.position;
-            return Raycast(pos + vbDownRight, pos + vbUpRight, _verticalHitbox.x, distance, Vector2.right, layer);
+            return Raycast(pos + vbRightDown, pos + vbRightUp, _verticalHitbox.x, distance, Vector2.right, layer);
         }
 
         internal PlatformerHit RaycastDown(LayerMask layer, float distance)
