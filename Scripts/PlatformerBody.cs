@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Text;
+using UnityEngine;
 
 namespace JaeminPark.PlatformerKit
 {
@@ -32,7 +33,7 @@ namespace JaeminPark.PlatformerKit
         public LayerMask platformLayer;
 
         /// <summary>
-        /// Velocity less than this value is treated the same with 0.
+        /// Threshold for velocity to be ignored.
         /// </summary>
         public const float almostZero = 0.01f;
 
@@ -217,12 +218,7 @@ namespace JaeminPark.PlatformerKit
             coll = GetComponent<PlatformerCollider>();
         }
 
-        private void FixedUpdate()
-        {
-            UpdatePhysics();
-        }
-
-        private void UpdatePhysics()
+        public void UpdatePhysics()
         {
             UpdateFrame();
             UpdateVelocity();
@@ -257,7 +253,7 @@ namespace JaeminPark.PlatformerKit
 
         private void UpdateVelocity()
         {
-            velocity += gravity * Time.timeScale;
+            velocity += gravity;
         }
 
         private void UpdateYAxis()
@@ -281,7 +277,7 @@ namespace JaeminPark.PlatformerKit
             isLeftSandwich = false;
             verticalSandwichGap = Mathf.Infinity;
 
-            float stickThreshold = Mathf.Sin(Vector2.Angle(Vector2.up, down.normal) * Mathf.Deg2Rad) * Mathf.Abs(velocity.x);
+            float stickThreshold = Mathf.Abs(down.normal.x) * Mathf.Abs(velocity.x);
             if (up.hit && up.distance <= stickThreshold && down.hit && down.distance <= stickThreshold)
             {
                 // 오른쪽, 왼쪽 끼임
@@ -303,26 +299,24 @@ namespace JaeminPark.PlatformerKit
             else if (upSlopeCheck && !upCheck)
             {
                 // Y축 위 경사로
-                float angle = Vector2.Angle(hbUp.normal, Vector2.up);
                 float ySpeed = Mathf.Abs(velocity.y);
                 float ySign = Mathf.Sign(velocity.y);
 
                 transform.position += new Vector3(
-                        Mathf.Cos(angle * Mathf.Deg2Rad) * ySpeed * Mathf.Sign(hbUp.normal.x),
-                        Mathf.Sin(angle * Mathf.Deg2Rad) * ySpeed * ySign
-                    ) * Time.timeScale;
+                        Mathf.Abs(hbUp.normal.y) * ySpeed * Mathf.Sign(hbUp.normal.x),
+                        Mathf.Abs(hbUp.normal.x) * ySpeed * ySign
+                    );
             }
             else if (downSlopeCheck && !downCheck)
             {
                 // Y축 아래 경사로
-                float angle = Vector2.Angle(hbDown.normal, Vector2.up);
                 float ySpeed = Mathf.Abs(velocity.y);
                 float ySign = Mathf.Sign(velocity.y);
 
                 transform.position += new Vector3(
-                        Mathf.Cos(angle * Mathf.Deg2Rad) * ySpeed * Mathf.Sign(hbDown.normal.x),
-                        Mathf.Sin(angle * Mathf.Deg2Rad) * ySpeed * ySign
-                    ) * Time.timeScale;
+                        Mathf.Abs(hbDown.normal.y) * ySpeed * Mathf.Sign(hbDown.normal.x),
+                        Mathf.Abs(hbDown.normal.x) * ySpeed * ySign
+                    );
             }
             else if (upCheck && !downCheck)
             {
@@ -363,7 +357,7 @@ namespace JaeminPark.PlatformerKit
             else
             {
                 // Y축 충돌하지 않음
-                transform.position += Vector3.up * velocity.y * Time.timeScale;
+                transform.position += Vector3.up * velocity.y;
             }
 
             // 플랫폼 처리
@@ -373,7 +367,7 @@ namespace JaeminPark.PlatformerKit
                 {
                     upPlatform?.OnBodyExit(this, Direction.Up);
                     upObject = up.gameObject;
-                    upPlatform = upObject.GetComponent<PlatformBase>();
+                    upPlatform = upObject?.GetComponent<PlatformBase>();
                     upPlatform?.OnBodyEnter(this, Direction.Up);
 
                     onPlatformEnter?.Invoke(upObject, upPlatform, Direction.Up);
@@ -393,7 +387,7 @@ namespace JaeminPark.PlatformerKit
                 {
                     downPlatform?.OnBodyExit(this, Direction.Down);
                     downObject = down.gameObject;
-                    downPlatform = downObject.GetComponent<PlatformBase>();
+                    downPlatform = downObject?.GetComponent<PlatformBase>();
                     downPlatform?.OnBodyEnter(this, Direction.Down);
 
                     onPlatformEnter?.Invoke(downObject, downPlatform, Direction.Down);
@@ -452,8 +446,6 @@ namespace JaeminPark.PlatformerKit
             }
             else if (rightCheck && !leftCheck)
             {
-                float angle = Vector2.Angle(vbRight.normal, Vector2.up);
-
                 // X축 오른쪽 충돌
                 if (isRightSandwich && right.distance > 0 && velocity.x >= -almostZero)
                 {
@@ -461,16 +453,16 @@ namespace JaeminPark.PlatformerKit
                     transform.position += Mathf.Min(vbRight.distance, 0) * Vector3.right;
                     velocity.x = 0;
                 }
-                else if (rightSlopeCheck && right.distance >= -almostZero && angle <= coll.maxHorizontalSlopeAngle)
+                else if (rightSlopeCheck && right.distance >= -almostZero && Mathf.Abs(vbRight.normal.x / vbRight.normal.y) <= coll.slopeCheckRate)
                 {
                     // 경사로
                     float xSpeed = Mathf.Abs(velocity.x);
                     float xSign = Mathf.Sign(velocity.x);
 
                     transform.position += new Vector3(
-                            Mathf.Cos(angle * Mathf.Deg2Rad) * xSpeed * xSign,
-                            Mathf.Sin(angle * Mathf.Deg2Rad) * xSpeed
-                        ) * Time.timeScale;
+                            vbRight.normal.y * xSpeed * xSign,
+                            -vbRight.normal.x * xSpeed * xSign
+                        );
                 }
                 else
                 {
@@ -482,8 +474,6 @@ namespace JaeminPark.PlatformerKit
             }
             else if (leftCheck && !rightCheck)
             {
-                float angle = Vector2.Angle(vbLeft.normal, Vector2.up);
-
                 // X축 왼쪽 충돌
                 if (isLeftSandwich && left.distance > 0 && velocity.x <= almostZero)
                 {
@@ -491,16 +481,16 @@ namespace JaeminPark.PlatformerKit
                     transform.position += Mathf.Min(vbLeft.distance, 0) * Vector3.left;
                     velocity.x = 0;
                 }
-                else if (leftSlopeCheck && left.distance >= -almostZero && angle <= coll.maxHorizontalSlopeAngle)
+                else if (leftSlopeCheck && left.distance >= -almostZero && Mathf.Abs(vbLeft.normal.x / vbLeft.normal.y) <= coll.slopeCheckRate)
                 {
                     // 경사로
                     float xSpeed = Mathf.Abs(velocity.x);
                     float xSign = Mathf.Sign(velocity.x);
 
                     transform.position += new Vector3(
-                            Mathf.Cos(angle * Mathf.Deg2Rad) * xSpeed * xSign,
-                            Mathf.Sin(angle * Mathf.Deg2Rad) * xSpeed
-                        ) * Time.timeScale;
+                            vbLeft.normal.y * xSpeed * xSign,
+                            -vbLeft.normal.x * xSpeed * xSign
+                        );
                 }
                 else
                 {
@@ -512,7 +502,7 @@ namespace JaeminPark.PlatformerKit
             }
             else
             {
-                transform.position += Vector3.right * velocity.x * Time.timeScale;
+                transform.position += Vector3.right * velocity.x;
 
                 float xSpeed = Mathf.Abs(velocity.x);
                 float xSign = Mathf.Sign(velocity.x);
@@ -521,16 +511,14 @@ namespace JaeminPark.PlatformerKit
                 bool isSlopeOpposite = velocity.x < -almostZero && slope.normal.x < 0 || velocity.x > almostZero && slope.normal.x > 0;
                 if (slope.hit && velocity.x != 0 && velocity.y == 0 && !(isLeftSandwich && isRightSandwich))
                 {
-                    float angle = Vector2.Angle(slope.normal, Vector2.up);
-                    
-                    if (isSlopeOpposite && angle <= coll.maxHorizontalSlopeAngle)
+                    if (isSlopeOpposite && Mathf.Abs(slope.normal.x / slope.normal.y) <= coll.slopeCheckRate)
                     {
                         // 아래에 내려가는 경사면이 있어 붙어서 가야 할 때
-                        transform.position -= Vector3.right * velocity.x * Time.timeScale;
+                        transform.position -= Vector3.right * velocity.x;
                         transform.position += new Vector3(
-                                Mathf.Cos(angle * Mathf.Deg2Rad) * xSpeed * Mathf.Sign(slope.normal.x),
-                                Mathf.Sin(angle * Mathf.Deg2Rad) * -xSpeed
-                            ) * Time.timeScale;
+                                slope.normal.y * xSpeed * Mathf.Sign(slope.normal.x),
+                                -slope.normal.x * xSign * xSpeed
+                            );
                     }
                 }
             }
@@ -542,7 +530,7 @@ namespace JaeminPark.PlatformerKit
                 {
                     rightPlatform?.OnBodyExit(this, Direction.Right);
                     rightObject = right.gameObject;
-                    rightPlatform = rightObject.GetComponent<PlatformBase>();
+                    rightPlatform = rightObject?.GetComponent<PlatformBase>();
                     rightPlatform?.OnBodyEnter(this, Direction.Right);
 
                     onPlatformEnter?.Invoke(rightObject, rightPlatform, Direction.Right);
@@ -562,7 +550,7 @@ namespace JaeminPark.PlatformerKit
                 {
                     leftPlatform?.OnBodyExit(this, Direction.Left);
                     leftObject = left.gameObject;
-                    leftPlatform = leftObject.GetComponent<PlatformBase>();
+                    leftPlatform = leftObject?.GetComponent<PlatformBase>();
                     leftPlatform?.OnBodyEnter(this, Direction.Left);
 
                     onPlatformEnter?.Invoke(leftObject, leftPlatform, Direction.Left);
